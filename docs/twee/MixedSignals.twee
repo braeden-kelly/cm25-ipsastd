@@ -1,0 +1,221 @@
+:: StoryTitle
+Problem Solving
+
+
+:: StoryData
+{
+  "ifid": "D8566BC0-4C9F-421C-930C-1B8286167BFC",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "Scenario 1",
+  "zoom": 1
+}
+
+
+:: Check Another Consumer {"position":"1125,650","size":"100,100"}
+(set:$time to ($time+45))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[In this scenario, checking if another team is also experiencing issues, may not be the worst idea, but it does require you to reach out and disturb another team, when you could most likely run a test more quickly yourself. If you are unable to reproduce the problem after some time, then it may be appropriate to reach out to another team to get more data on what is causing the issue.  But initially, your time is probably best spent getting the exact test data and URL from the consumer having issues so you can reproduce the issue yourself.  ]]
+You reach out to (if: $consumerCount is 0)[Joslin](else:)[Margo] from who is a tester from another app team that consumes your API.  You ask (if: $consumerCount is 0)[Joslin](else:)[Margo] if her team has noticed any issues with your API and if she can run a quick test against your endpoint.  About (if: $consumerCount is 0)[45](else:)[(text:65 + ($consumerCount * 10))] minutes later, she sends you a message that everything is working fine from what she can see.
+
+Not discovering any new helpful information, you consider your next move. 
+[[Try something else.->Trouble Shoot]] 
+
+(set: $consumerCount to it + 1)
+
+
+:: Check App Logs {"position":"900,525","size":"100,100"}
+(set:$time to ($time+25))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Digging through the app logs right away may waste valuable time if the issue isn't causing an exception or stacktrace in your app logs.  Also, digging through logs, depending on the log level, may take time and send you chasing after errors that weren't the cause of the consumer reporting the issue.   It's not uncommon to see regular warning or error messages in app logs based on bad test data from consumers or developers.   When you aren't sure if there is a problem with your back end application, your time may be better spent first isolating where the error is coming from (backend app, apigee proxy, or bad data) and reproducing the error.  Once you are able to reproduce the error and it seems likely the error is caused by the backend application, then at that point it makes sense to check the app logs.]]
+You go to the Splunk site and spend a few minutes crafting a search to find errors or exceptions that happened in the past day.  Your logging level in this test environment is pretty verbose so it takes several minutes to return results.  You see a few odd errors and warning messages, but nothing that jumps out as the definitive issue.   
+
+Not seeing an obvious issue after spending 20 minutes in the logs, you consider what to do next.
+
+[[- Ask the consumer when the last time they got the error, so you can limit your Splunk search to a shorter time frame.->Splunk Search Shorter]]
+[[- Dig deeper into the error messages you see in the logs.->Dig Into False Errors]]
+[[- Try something else.->Trouble Shoot]] 
+
+
+
+
+:: Check URL {"position":"1225,200","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[If you are not the first to produce the error, getting the exact parameters to produce the error is a good first step.  Also, getting the actual error message is huge.  It's amazing how many times the error message or stacktrace points to the root of the issue.  In this case the 400 Error literally  means "Bad Request" which turns out to be the issue in this scenario.  That is, it's a bad request for the URL they are using.]]
+You attempt to get more specific information as to what exact endpoint they are hitting and what the error message is.  You reach out to the consumer asking to confirm the url they are using when seeing the error and if they can send you the error message. They respond back that the error is a "400 Bad Request" and you notice the URL is an apigee internal url to your V1 endpoint:
+
+<img src="..images/URL.PNG"/>
+
+[[- Use one of your saved V1 test payloads to hit the endpoint->Hit URL]] 
+[[- Ask the consumer to send you the payload request they are using that is having issues.->Use Consumer Payload and URL]]
+[[- Try something else.->Trouble Shoot]] 
+
+(set: $hasURL to true)
+
+
+:: Dig Into False Errors {"position":"1000,725","size":"100,100"}
+(set:$time to ($time+20))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Following random errors in the logs can be a large effort that eats up a lot of time.  This can be required for difficult issues, but you should usally reserve these archaeological digs for when you can reproduce the problem and know the error you are chasing is the actual cause of the issue.]]
+You find a particularly odd error message in the logs and try to dig in to find the root cause.  After about an hour of researching this error, you find that the error was actually caused by one of your automated test scripts passing in bad credentials into the service.  The testers tell you this issue was resolved early today.  You realize this issue has nothing to do with the issue the consumer was reporting and realize you wasted a lot of time and now consider what to do next.
+
+[[- Ask the consumer when the last time they got the error, so you can limit your Splunk search to a shorter time frame.->Splunk Search Shorter]]
+[[- Try something else.->Trouble Shoot]] 
+
+
+
+
+:: Dig Into False Errors For Time Frame {"position":"775,825","size":"100,100"}
+(set:$time to ($time+30))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[In this scenario, it could be that there is an error in the logs that could help.  But digging through tons of logs to find all error messages can be a huge time suck.  You may get lucky and find the smoking gun, but it may be better to try to be able to reproduce the error than searching for all errors.  In this scenario, your logs may show you that there was an error with a bad request and depending on what you log it could have pointed to the specific consumer, but often it can be difficult to verify the error you find is the cause of the issue they are reporting if you can't reproduce the error at will.  Also, verbose logging is a double edged sword, that is, the more you log the more data you can have to troubleshoot. However, the more logs you have the harder it can be to sift through them all also. ]]
+You decide to  dig deeper into the parser error that happened during the time the consumer reported they had issues.  You try a few splunk searches to get more logs around the error statement.  You spend 30 minutes or more to get splunk to display logs around one of the errors, but they don't really provide much value other than that the application didn't like some request.  Unfortunately, you can't find any definitive data in the logs that tie this error back to the consumer, so you decide you need to try something else.
+
+[[- Try something else.->Trouble Shoot]] 
+
+
+
+
+:: Hit URL {"position":"1450,400","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[After learning that the consumer is hitting your V1 service, it's not a bad idea to run a quick test against that endpoint.  The only issue is that you aren't testing apples to apples.  That is you don't know request data the consumer is using.  However, if you can run a quick test, it's a good canary test to make sure it's not some catastrophic failure with your V1 endpoint. So, this is a good path assuming you can do it quickly.]]
+Using one of your saved V1 tests in Postman, you hit the V1 version of the service to discover that it works exactly as expected. 200 Successful Response is returned.
+
+Not being able to reproduce the issue, you consider what to do next. 
+
+[[Try something else.->Trouble Shoot]] 
+
+
+:: Scenario 1 {"position":"775,150","size":"100,100"}
+You are a developer on a Service Provider App which exposes several REST API endpoints that is deployed to a Kubernetes test environment.  Your REST APIs also have an Apigee Proxy that is a pass through to your app in kubernetes.  The Apigee Proxy handles normal items like logging and OAUTH validation.  You've recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
+
+Here is an architectural overview of the app.
+<img src="..images/common/AppArchDesign.png"/>
+
+(border:"solid")+(border-color:red)[(color:red)[Problem to Solve:]
+A consumer of your REST API reaches out to you and says they are getting errors accessing your API in the test environment. That is all the information you've been given. You must now consider what's the best option to get to the root of the problem.]
+
+[[Start Troubleshooting->Trouble Shoot]]  
+
+(set: $hasCheckedOtherConsumer to false)
+(set: $hasPayload to false)
+(set: $hasURL to false)
+(set: $consumerCount to 0)
+(set: $showHelp to false)
+
+
+(set:$time to 0)
+
+
+
+
+
+
+(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")]
+
+
+:: Splunk Search Shorter {"position":"700,625","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Digging through less logs is a good idea, but if you don't know if the app is throwing an error or is the root cause, then you may look in vain.  Even if you find errors, it can be hard to determine if they are the cause of the reported issue if you can't reproduce the issue.]]
+You reach out to the consumer and ask if they can give you a date/time of the last time they saw the issue.  They give you the specific time of the last time they tested.  You run your Splunk search again, but this time with a smaller time window to see less logs.  Again you see  a few odd errors and warnings, but the search returns faster this time. You do notice an error around parsing a request that seems intriguing. 
+
+You tried to decide what to do next...
+
+[[- Dig deeper into the parsing error message you see in the logs.->Dig Into False Errors For Time Frame]]
+[[- Try something else.->Trouble Shoot]] 
+
+(set: $knowErrorTimeFrame to true)
+
+
+:: Test Private Endpoint {"position":"600,325","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Doing a quick test against your backend service in an isolated way by bypassing Apigee is not a bad idea.  Being able to quickly verify your back end is up and running is a good idea when there is a reported issue.  In this scenario, it turns out that your backend is up and running just fine, but if you are able to do a quick test to verify your backend is up and running, this saves you from having to dig into logs or find out what's wrong with the backend when there really isn't an issue there. ]]
+In an effort to see if you can quickly reproduce the issue, you decide to use one of your existing saved Postman tests to hit the (if:$hasURL)[V1 endpoint](else:)[latest V2 endpoint] in your test environment.  You grab a test payload and use postman to hit your direct endpoint bypassing Apigee to your service provider app in the test environment.  You get a successful response.  
+
+Not seeing any issue using your sample request against the private endpoint you consider what to try next. 
+
+[[- Test your endpoint through Apigee->Test through Apigee With Test Request]]
+[[- Try something else.->Trouble Shoot]] 
+
+
+
+
+:: Test With Consumer Payload {"position":"1200,450","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[If you are not the first to produce the error, getting the exact parameters to produce the error is a good first step.  So, it's always good to get the data/input being used to produce the issue. Sometimes, the issue is directly related to the type or format of the data coming through.  It turns out in this scenario that the request data was the issue because it was the wrong input for the URL they were using.  But even if it wasn't the root cause, it's a good first step to get the data being tested with that's causing the issue.  This way you are chasing the same issue as the one reporting the problem and not accidently introducing new variables or other issues.]]
+In an attempt to get more specific context around how they are testing, you ask the consumer for the payload request they are using to call your service.  Upon receiving the payload, you recognize it as a newer V2 service request message.  You therefore run a test against the V2 version of your service in the test environment and get back a successfull response.
+
+Since their request works fine when testing the V2 service in the test environment, you consider your next steps...
+
+[[- Ask the consumer to send the URL they are using to hit your API.->Use Consumer Payload and URL]] 
+[[- Consider other options->Trouble Shoot]] 
+
+
+(set: $hasPayload to true)
+
+
+
+:: Test through Apigee With Test Request {"position":"650,475","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[After verifying that the backend is working for your simple test, validating the Apigee proxy is a good next move.  It turns out, in this case, that your proxy and backend are working as expected.  But being able to quickly rule out obvious major issues with the proxy is not a bad call. ]]
+You now decide to try to test more like the consumer by calling through Apigee. You pull up your saved Postman collection to test against your internal apigee endpoint for the (if:$hasURL)[V1](else:)[V2] using a saved payload you've used before. The request goes through just fine and you get a successful response.
+
+Not finding any issue, you consider what to do next...
+
+[[Try something else.->Trouble Shoot]] 
+
+
+:: TimeHeader [header] {"position":"975,125","size":"100,100"}
+(align:"==>")[(border:"solid")[(color:yellow)[Time spent: [(str:$time)]<time| Minutes]]]
+
+
+:: Trouble Shoot {"position":"950,350","size":"100,100"}
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[It's very challenging to troubleshoot an issue unless you can reproduce the issue.  If instead of reproducing the issue, you simply start checking logs or make assumptions, you may get lucky, but most problems in complex environments aren't so easy and so it's better to figure out how to reproduce the problem so you can quickly get to the root.  So, think about the fastest way to reproduce the issue. Usually it involves understanding the context around the issue.  That is what are the exact conditions that are causing the issue and then how to isolate different parts of the system to figure out where the problem lies.]]
+
+(if:$showHelp is false)[(color:red)[NOTE:](color:white)[ As you go through this scenario, some options may lead you back to this page to try another path.  Some paths may disappear upon trying them once. Other paths may remain, but may change depending on paths you went down previously.]]
+
+(if: $hasURL is false)
+[[- Ask what URL the consumer is using and what is the error?->Check URL]]\
+(if: $hasURL is true AND $hasPayload is true)\
+[[- Test with Consumer's Payload and URL.->Use Consumer Payload and URL]]
+[[- Bypass Apigee to test  your service provider directly.->Test Private Endpoint]]
+(if: $hasPayload is false)\
+[[- Ask the consumer for the request data they are using and test with it.->Test With Consumer Payload]]
+[[- Ask a different consumer of the service to check if the service is working.->Check Another Consumer]]
+[[- Check the app logs for errors or exceptions.->Check App Logs]]
+
+
+
+
+
+
+
+
+
+
+
+(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")]
+
+
+:: Use Consumer Payload and URL {"position":"1275,700","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue) [Having the actual url and the request that was used to produce the issue turned out to be key in this scenario.  Because it turned out while each was "correct" alone, but, together, the url with the request was not correct.  Typically URL's for api endpoints are injected through environment variables or properties files at deployment time.  It's not uncommon for someone to make a mistake and not update the correct config to change a setting like this.  So, it's not at all uncommon to find a mismatch between configs and code deployed to an environment.]]
+
+
+
+Now having the consumer's payload request and the URL they are testing with you notice something odd...
+
+You realize the payload they sent is for a V2 service and they are using the V1 endpoint.  You quickly test their payload with their url which you know won't work, but just to verify its the same error they are seeing.  You reproduce the same error quickly having both the payload and the url the consumer was using.
+
+You tell the consumer their issue is using the wrong payload with the version of the API they are using.  You send them the V2 URL as it seems their code has been updated to  generate a V2 request.  
+
+They realize their mistake is that they forgot to update the URLin their configs to use the new V2 version of the API in their latest deployment.  They thank you for quickly finding their issue and heap mounds of praise upon you!
+
+<img src="..images/pythonMuchRejoicing.gif"/>
+
+(set: $showHelp to true)\
+(set: $hasCheckedOtherConsumer to false)\
+(set: $hasPayload to false)\
+(set: $hasURL to false)\
+(set: $consumerCount to 0)\
+
+(link: "Try Again to Improve Your Time")[(set: $time to 0)(goto: "Trouble Shoot")]
+[[Start Again with Lessons Enabled->Trouble Shoot]] 
+
+

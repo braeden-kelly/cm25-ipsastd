@@ -1,0 +1,500 @@
+:: StoryTitle
+Dan Brady Down
+
+
+:: StoryData
+{
+  "ifid": "957183F2-38A7-4E72-A1CB-B3B0885631BE",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "App Overview",
+  "zoom": 1
+}
+
+
+:: \ Search for "500 Internal Server" messages {"position":"25,600","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+You decide to search for any logs that contain a "500 Internal Server" message.
+
+You create the search query and run it for the past 24 hours.
+
+The search spins for several minutes and returns 0 results.
+
+You consider what to do next:
+
+[[- Search for "ERROR" level logs in Splunk-> Search for any logs of type "ERROR"]] 
+[[- Try something else.->Start Troubleshooting]]   
+
+
+
+:: \ Search for any logs of type "ERROR" {"position":"150,825","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Using Splunk is a great way to search through logs from all your different pods. One draw back of cloud based logging  is that by default each line in a log becomes an individual entry into Splunk.  This makes seeing continuous stack traces a little problematic.  If you search for an error log, you may see the starting exception, but not the stacktrace .]]]
+You use your Splunk skills to find all log entries of type "Error" for the past 4 hours.  
+You get back hundreds of results.
+
+You see several of the following:
+
+Log Entry 1:
+(color:red)[`2024-08-05T17:19:44.303-04:00 ERROR 45640 --- [pizza-app] [nio-8080-exec-3] o.h.engine.jdbc.spi.SqlExceptionHelper`   : HikariPool-1 - Connection is not available, request timed out after  (str:$connectionTimeout)ms (total=0, active=0, idle=0, waiting=0)]
+Log Entry 2:
+(color:red)[`2024-08-05T17:19:44.308-04:00 ERROR 45640 --- [pizza-app] [nio-8080-exec-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : Communications link failure`]
+Log Entry 3:
+(color:red)[`2024-08-05T17:19:44.317-04:00 ERROR 45640 --- [pizza-app] [nio-8080-exec-3] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception`]
+
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[If you look closely at the errors above, you'll notice the first two indicate an issue connecting or communicating with something.  And if you look at the class that threw the exception, you'll see it was the SqlExceptionHelper.  You may not know what a SqlExceptionHelper is, but hopefully you realize it has to do with SQL which has to do with a database.]]]
+
+
+[[- Restart the application]] 
+[[- Test the Application Locally]] 
+[[- Google the first "SqlExceptionHelper" exception]]
+[[- Test Connectivity to Database]]
+
+
+:: - Ask tester to test again {"position":"200,300","size":"100,100"}
+(set:$time to ($time+30))(replace:?time)[$time]
+You reach back out to the tester and tell them you restarted the app and see if they can test again.
+
+After about 30 minutes, the tester replies back to you that they ran the tests again and they all failed again with the same error.  
+
+You consider what your next steps should be:
+
+[[Try something else->Start Troubleshooting]] 
+
+
+:: - Check Pod logs {"position":"850,625","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Checking the pod logs directly can quickly get you a list of ordered logs and a quick complete picture for what's going on.  The draw back is without using a log aggregator (like Splunk) it can be more difficult to filter or search through the logs.  Also, if you have multiple pods it may take time to go through the logs from all the pods.  However, in a serious outage like this that seems to be impacting all tests, then it's highly likely you'll find the same errors across all the logs.  So, in this scenario it pays to jump straight to the pod logs.]]]
+
+You use your kubectl and command line skills to grab the test environment logs from one of the pods. Rifling through the logs you see an exception and stack trace that stands out.  
+
+(text-colour:red)[2024-08-05T09:46:42.862-04:00 ERROR 45640 --- `[pizza-app] [nio-8080-exec-3] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception 
+[Request processing failed: org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction] with root cause
+
+java.net.ConnectException: Connection refused: no further information
+        at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+        at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672) ~[na:na]
+        at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542) ~[na:na]       
+        at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:597) ~[na:na]
+        at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327) ~[na:na]
+        at java.base/java.net.Socket.connect(Socket.java:633) ~[na:na]
+        at com.mysql.cj.protocol.StandardSocketFactory.connect(StandardSocketFactory.java:144) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:53) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.NativeSession.connect(NativeSession.java:140) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:969) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:833) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:420) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:238) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:137) ~[HikariCP-5.1.0.jar:na]
+        at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:360) ~[HikariCP-5.1.0.jar:na]
+        ...`]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Pay close attention to Stacktraces.  Look at each Exception for clues as well as pay attention to the trace information itself.  Look at what classes and methods are being called.  They class or method that was being invoked at the time of the exception may be as big of a clue to the issue as the type of Exception itself.  In this case, the ConnectException is a great clue, but to understand what type of connection failed, you need to look at the stacktrace.  The fact that most of the classes in the stacktrace come from the (color:white)[mysql] package is a nice clue.  Also, the fact that near the bottom of the stacktrace; which is the beginning of the call tree, we see this exception started from a call to a (color:white)[DriverDataSource.getConnection()] method call.]]]
+
+You consider what to do next...
+[[- Restart the application]] 
+[[- Test the Application Locally]] 
+[[- Google the "CannotCreateTransactionException"]]
+[[- Test Connectivity to Database]]
+[[- Check Splunk logs]] 
+
+
+
+
+
+
+:: - Check Splunk logs {"position":"325,625","size":"100,100"}
+You decide to go to splunk to see if you can find more information to point to the root cause.
+
+[[ Search for "500 Internal Server" messages]]
+[[ Search for any logs of type "ERROR"]]
+
+
+
+:: - Check the app logs in the test environment {"position":"525,525","size":"100,100"}
+You decide it would be good to see if there are any errors or messages in the app logs to help you get to the root of the issue.
+
+You know you can check the logs in Splunk which allows you to search  through vast amounts of logs or you could check the current Pod logs either through Rancher or Kubectl commands to get real time logs.
+
+
+[[- Check Splunk logs]]
+[[- Check Pod logs]]
+
+
+
+
+
+
+:: - Google the "CannotCreateTransactionException" {"position":"900,825","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Searching google or other search engines for Exceptions or StackTraces can be a great approach to help find possible causes for your issue. However, you do have to be careful when searching for generic exceptions as the same error may arise in a different scenario that doesn't apply to your current situation.  Before following any one answer too deeply, it's probably best to look at a few of the top search results to find the error scenario that best matches yours.]]]
+
+You google for the phrase "org.springframework.transaction.CannotCreateTransactionException: Could not 
+open JPA EntityManager for transaction"
+
+The first google search result takes you to a StackOverFlow post where the original poster complains about this error:
+
+Post Title:
+(color:blue)["Could not open JPA EntityManager for transaction; nested exception is java.lang.IllegalStateException"]
+
+Post Message:
+(color:blue)["I am quite new to Spring and Spring-Batch in particular. Still I somehow managed to install the Spring Batch-Admin. I added custom jobs and Hibernate/JPA for persistence.
+
+Everything is working as expected, up to the point where the first chunk should be persisted. Then I receive the following error-message:
+
+org.springframework.transaction.CannotCreateTransactionException: 
+      Could not open JPA  EntityManager for transaction;
+
+`nested exception is java.lang.IllegalStateException: Already value
+      [org.springframework.jdbc.datasource.ConnectionHolder@60d31437] 
+      for key [org.springframework.jdbc.datasource.DriverManagerDataSource@12da4b19] 
+      bound to thread [jobLauncherTaskExecutor-1]"`]
+
+You look back at your exception in the logs for reference and then decide what to do: 
+Your app exception:
+(color:red)[`[Request processing failed: org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction] with root cause
+
+java.net.ConnectException: Connection refused: no further information`]
+
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[In this case, the StackOverflow post is about an error caused by an IllegalStateException, but your Exception has a root cause of Connection Refused.  I wouldn't be sure that this post applies to your scenario.]]]
+
+Do you...
+
+[[- Look at Answers for this Post->Wrong StackOverFlow]]
+[[- Go to the second search result from Google->Correct Article On Error]]
+[[- Restart the application]] 
+
+
+Actual StackOverflow post: https://stackoverflow.com/questions/20907206/could-not-open-jpa-entitymanager-for-transaction-nested-exception-is-java-lang
+
+
+
+:: - Google the first "SqlExceptionHelper" exception {"position":"225,1025","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+You Google the phrase from the log (color:blue)["SqlExceptionHelper : HikariPool-1 - Connection is not available, request timed out after"]
+
+
+The first search result is from StackOverflow and has the title:
+(color:blue)["HikariPool-1 - Connection is not available, request timed out after 30000ms for very tiny load server"]
+
+The highest upvoted answer states this:
+(color:blue)["Your database is not obtaining connection within (30000 milliseconds that is default connectionTimeout property) because of network latency or some of the queries which are taking too long to execute(more than 30000 milliseconds).
+
+Please try to increase value of property (color:yellow)[connectionTimeout].
+
+YML configuration example:"]
+(background:gray)+(border:"solid")+(border-color:white)+(color:black)
+[spring:
+  (text-indent:12)[datasource:]
+    (text-indent:24)[hikari:]
+      (enchant: ?indentmost's lines,(text-indent:36))\
+      |indentmost>[minimumIdle: 2
+      maximumPoolSize: 10
+      idleTimeout: 120000
+      connectionTimeout: 300000
+      leakDetectionThreshold: 300000]]
+
+You consider this and decide what to do next...
+[[-Google Second Splunk Error]]
+[[- Increase the "connectionTimeout" setting]]
+[[- Restart the application]] 
+[[- Try Something Else->Start Troubleshooting]] 
+
+
+https://stackoverflow.com/questions/47758091/hikaripool-1-connection-is-not-available-request-timed-out-after-30000ms-for
+
+
+:: - Increase the "connectionTimeout" setting {"position":"400,1250","size":"100,100"}
+(set:$time to ($time+15+(($connectionTimeout*2) /60000)))(replace:?time)[$time]
+You decide to follow the StackOverFlow post about increasing the "connectionTimeout" property to give your application more time to connect to the database.  You decide to double the connection timeout value to (str:($connectionTimeout * 2))ms from it's old value of  (str:$connectionTimeout)ms.
+(set:$connectionTimeout to $connectionTimeout * 2)
+You spend about an hour adding this new property into your helm chart and values yaml to allow it to be injected as an environment variable into your app at deployment time.
+You commit the changes to the values.yaml and the helm chart and kick off the deployment.
+
+About 10 minutes later, the deployment finishes and says your app is running.
+
+You run a test through Postman again and it spins for just over (str:($connectionTimeout / 60000)) minutes before giving the same 500 Internal Server Error.  
+
+What do you do?
+
+[[- Ask the tester to test again->- Ask tester to test again]]
+[[- Increase the "connectionTimeout" to an even higher value->- Increase the "connectionTimeout" setting]]
+[[- Check Splunk logs]] 
+[[- Check Pod logs]]
+[[- Try Something Else->Start Troubleshooting]] 
+
+
+
+
+
+
+
+:: - Restart the application {"position":"400,375","size":"100,100"}
+(set:$time to ($time+15))(replace:?time)[$time]
+Since it was reported that so many tests were failing you decide to restart the application.
+You run your Continuous Deployment pipeline to restart the application.
+It completes after about 15 minutes.
+
+What do you do next?
+[[- Ask tester to test again]] 
+[[- Send a request through Postman yourself]]
+[[- Check the app logs in the test environment]] 
+[[- Test the Application Locally]] 
+
+
+
+
+:: - Send a request through Postman yourself {"position":"925,450","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[If the situation is as bad as implied with all tests failing, then it should be easy to get the error message by reproducing it yourself with a quick test.  If you have a quick way to test the app, then this is a good approach.  Reproducing the error scenario is a great start to being able to sovle the issue. Unfortunately, sometimes API error responses may not give a lot of information around what is causing the issue.  So, you most likely will need to go somewhere to get more information about what's happening on the server.]]]
+
+You pull up your Postman workspace and send a simple GET request to test your application.  You get a 500 Internal Service error.
+
+You decide to try a Post request and get another 500 Internal Service error. 
+
+You consider what to do next... 
+
+[[- Check the app logs in the test environment]]
+[[- Test the Application Locally]]
+[[- Restart the application]]
+
+
+:: - Test Connectivity to Database {"position":"725,1050","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+You open up your approved Database client application and try to connect to the test database.  You get an "Unable to connect to `<server name>`" error and realize that the Database is down.
+
+You reach out to the DB team and let them know of the issue and they say its a known issue due to Crowdstrike and they can fix your issue by restarting the test DB.  5 minutes later they tell you the DB server is back up and running.
+
+You run a test through Postman and find that it is working!
+
+You ask the tester to test again and the tester pings you back after a few minutes with praise and adoration for fixing the test environment!
+
+<img src="..images/wonkayoudidit.gif"/>
+
+(link: "Try Again to Improve Your Time")[(set: $time to 0)(goto: "Start Troubleshooting")]
+
+
+:: - Test the Application Locally {"position":"1150,325","size":"100,100"}
+(set:$time to ($time+15))(replace:?time)[$time]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Running the app locally can be a good way to troubleshoot problems and try to reproduce.  If the issue is in a test environment, it could be environment specific, so make sure you are simulating the test environment as much as possible with your code and configuration.  ]]]
+You decide to try to run the app locally to see if there are any issues with external dependencies.  You start up your IDE and make sure your have the same version of the code that's in the test environment and start the app.
+
+The application starts up and when you test you start noticing the following errors:
+
+
+(text-colour:red)[2024-08-05T09:46:42.862-04:00 ERROR 45640 --- `[pizza-app] [nio-8080-exec-3] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception 
+[Request processing failed: org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction] with root cause
+
+java.net.ConnectException: Connection refused: no further information
+        at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
+        at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672) ~[na:na]
+        at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(NioSocketImpl.java:542) ~[na:na]       
+        at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:597) ~[na:na]
+        at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327) ~[na:na]
+        at java.base/java.net.Socket.connect(Socket.java:633) ~[na:na]
+        at com.mysql.cj.protocol.StandardSocketFactory.connect(StandardSocketFactory.java:144) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:53) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.NativeSession.connect(NativeSession.java:140) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:969) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:833) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:420) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:238) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180) ~[mysql-connector-j-9.0.0.jar:9.0.0]
+        at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:137) ~[HikariCP-5.1.0.jar:na]
+        at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:360) ~[HikariCP-5.1.0.jar:na]
+        ...`]
+
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Pay close attention to Stacktraces.  Look at each Exception for clues as well as pay attention to the trace information itself.  Look at what classes and methods are being called.  They class or method that was being invoked at the time of the exception may be as big of a clue to the issue as the type of Exception itself.  In this case, the ConnectException is a great clue, but to understand what type of connection failed, you need to look at the stacktrace.  The fact that most of the classes in the stacktrace come from the (color:white)[mysql] package is a nice clue.  Also, the fact that near the bottom of the stacktrace; which is the beginning of the call tree, we see this exception started from a call to a (color:white)[DriverDataSource.getConnection()] method call.)]]]
+
+You consider what to do next...
+[[- Check the app logs in the test environment]] 
+[[- Google the "CannotCreateTransactionException"]]
+[[- Test Connectivity to Database]]
+
+
+
+
+
+
+
+
+
+
+
+:: -Google Second Splunk Error {"position":"550,1125","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+You google for the error phrase (color:red)["SqlExceptionHelper : Communications link failure"]
+
+The first result from that search is to a StackOverflow post that seems to have a similar exception and an answer with 502 upvotes.
+
+https://stackoverflow.com/questions/6865538/solving-a-communications-link-failure-with-jdbc-and-mysql
+The answer says this:
+
+(color:blue)["While I was seeking the internet to find the solution for this error, I figured out that there are many solutions that worked for at least one person, but others say that it doesn't work for them! why there are many approaches to this error? It seems this error can occur generally when there is a problem in connecting to the server. Maybe the problem is because of the wrong query string or too many connections to the database.
+
+So I suggest you to try all the solutions one by one and don't give up!"]
+
+The answer post then goes and lists nearly a dozen possible things to try to resolve the problem.
+However, most of them deal with updating configs on the Database(MySql) server or changing basic connection string settings on your app.
+
+But since your app was working fine before, you decide none of these options will help you with your issue.
+
+However there is a link at the very top of the post that says, "This question already has answers here:" and then provides a link to another StackOverflow post about "Communications link failure" with MySql.
+
+You consider what to do next...
+
+[[- Follow the link at the top of the StackOverflow post->Good StackOverflow post followed from Splunk]]
+[[- Restart the application]]
+[[- Try something else->Start Troubleshooting]] 
+
+
+:: App Overview {"position":"425,75","size":"100,100"}
+Your a developer on a Service Provider application that provides a REST based API that is proxied through Apigee. The application is responsible for placing pizza orders. 
+
+Here is an architectural overview of the app.
+<img src="..images/common/AppArchDesign.png"/>
+
+(border:"solid")+(border-color:red)[(color:red)[Problem to Solve:]
+You get a Teams message from a tester that says the service provider app in the test environment is failing nearly all the tests.]
+
+[[Start Troubleshooting]]
+(set:$connectionTimeout to 30000)
+
+(set:$showHelp to False)
+
+(set:$time to 0)
+
+
+(link: "enable help")[(set: $showHelp to True)(goto: "Start Troubleshooting")]
+
+
+:: Correct Article On Error {"position":"1025,950","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+The second search result from Google takes you to a Broadcom knowledge base article, which seems odd, but you decide to take a quick look at it.
+
+The error this article references is as follows:
+(color:red)["The error entry in the job file has the following message
+
+org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction;
+nested exception is javax.persistence.PersistenceException: com.microsoft.sqlserver.jdbc.SQLServerException: The connection is closed."]
+
+It's not exactly the same as your error and stacktrace, but it's close and you decide to look at the resolution. You read the following:
+
+(color:blue)[Each time the Portal needs a connection from the connection pool, it checks the connectivity to the database before borrowing it.
+This is enforced by the following entries in application.properties
+spring.datasource.tomcat.test-on-borrow=true
+spring.datasource.tomcat.validation-query=select 1
+
+It is therefore very unlikely that the Portal would 'borrow' an invalid database connection from the connection pool.
+
+Logically, the only explanation is that the database session was dropped from outside the tool and therefore invalidating the connection to the database.]
+
+You assume that eventhough you don't understand what "Portal" or "tool" they are referring to, that it ultimately is a similar style Spring Boot app as yours and maybe a similar cause. 
+
+You consider what to do next:
+
+[[- Restart the application]] 
+[[- Test Connectivity to Database]] 
+[[- Try something else->Start Troubleshooting]] 
+
+
+https://knowledge.broadcom.com/external/article/194021/jpa-entitymanager-error-message.html
+
+
+:: Get Error Message From Tester {"position":"975,100","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Getting the error message from the tester could be a good start.  That is if they respond quickly.  If they don't respond quickly, you may look at finding the error without having to depend on someone else.  If the situation is as bad as implied with all tests failing, then it should be easy to find an error message in the logs or reproducing it yourself with a quick test..]]]
+You ask the tester to send you the errors they are seeing.  She messages you 10 minutes later with a few different errors, but most of them seem to have a 500 Internal Server Error.
+
+You consider what to do next... 
+
+[[- Send a request through Postman yourself]]
+[[- Check the app logs in the test environment]]
+[[- Test the Application Locally]]
+[[- Restart the application]]
+
+
+:: Good StackOverflow post followed from Splunk {"position":"650,1375","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+You decide to follow the link at the top of the StackOverflow post that says the question about the CommunicationsException has already been answered.
+
+That link brings you to a post with an answer that states:
+(color:blue)[If you get a SQLException: Connection refused or Connection timed out or a MySQL specific CommunicationsException: 
+  Communications link failure, then it means that the DB isn't reachable at all. This can have one or more of the following causes:
+
+1. IP address or hostname in JDBC URL is wrong.
+2. Hostname in JDBC URL is not recognized by local DNS server.
+3. Port number is missing or wrong in JDBC URL.
+4. DB server is down.
+5. DB server doesn't accept TCP/IP connections.
+6. DB server has run out of connections.
+7. Something in between Java and DB is blocking connections, e.g. a firewall or proxy.
+
+To solve the one or the other, follow the following advices:
+
+1. Verify and test them with ping.
+2. Refresh DNS or use IP address in JDBC URL instead.
+3. Verify it based on my.cnf of MySQL DB.
+4. Start the DB.
+5. Verify if mysqld is started without the --skip-networking option.
+6. Restart the DB and fix your code accordingly that it closes connections in finally.
+7. Disable firewall and/or configure firewall/proxy to allow/forward the port.]
+
+You consider your next steps carefully...
+
+[[- Restart the application]]
+[[- Go Back to Splunk Logs-> Search for any logs of type "ERROR"]] 
+[[- Test Connectivity to Database]]
+[[- Try Something Else->Start Troubleshooting]] 
+
+
+
+https://stackoverflow.com/questions/6865538/solving-a-communications-link-failure-with-jdbc-and-mysql
+
+
+:: Start Troubleshooting {"position":"700,125","size":"100,100"}
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[If all the tests are failing, that could indicate a serious issue with the app or it's dependencies.  Getting the error message may be a good start.  But do you get the error by trying to reproduce it yourself or ask what the tester was seeing?  Or do you just look at the logs? None of these are bad choices.  You should try to take the route that gets you the information(in this case the error message) the quickest.]]]
+
+[[- Ask the tester to send you the error message->Get Error Message From Tester]]
+[[- Send a request through Postman yourself]]
+[[- Check the app logs in the test environment]]
+[[- Test the Application Locally]]
+[[- Restart the application]]
+
+(link: "reset timer")[(set: $time to 0)(goto: "Start Troubleshooting")]
+(link: "enable help")[(set: $showHelp to True)(goto: "Start Troubleshooting")]
+
+
+
+:: TimerHeader [header] {"position":"600,0","size":"100,100"}
+(align:"==>")[(border:"solid")[(color:yellow)[Time spent: [(str:$time)]<time| Minutes]]]
+
+
+:: Wrong StackOverFlow {"position":"1175,775","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+You browse through the StackOverFlow post and look at the top posted answer.
+It has 28 upvotes and states... 
+
+Answer Post:
+(color:blue)["The error means that the transaction manager is trying to bind the datasource (not the entity manager) to the thread, but the datasource is already there and this is unexpected."]
+
+And that post states that there are two possible explanations for this error:
+(color:blue)
+["
+- Somebody (another transaction manager?) is adding the datasource to the thread before the transaction manager and this is unexpected.
+
+- Or no one is adding the datasource to the transaction manager, is just that at the end of the task execution no one cleans the thread before returning it to the pool, maybe due an error or an unhandled exception."]
+
+Neither of these sound like they apply to your situation and so you compare the original posters stacktrace to yours and find that their stacktrace and exception is different than yours as their nested or (color:blue)["Caused by"] exception is an (color:red)["IllegaStateException"] where yours is a (color:red)["java.net.ConnectException: Connection refused:"].
+
+You realize this answer is for a different problem and decide to do something else:
+
+[[- Look the second search result from Google->Correct Article On Error]] 
+[[- Go back to App Logs->- Check Pod logs]]
+[[- Go a different Path->Start Troubleshooting]] 
+
+
+
+
+
+https://stackoverflow.com/questions/20907206/could-not-open-jpa-entitymanager-for-transaction-nested-exception-is-java-lang

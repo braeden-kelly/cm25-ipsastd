@@ -1,0 +1,265 @@
+:: StoryTitle
+First Ticket
+
+
+:: StoryData
+{
+  "ifid": "958D3C0B-245E-41EB-B5A4-384A3F4B4B37",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "Start Here",
+  "tag-colors": {
+    "Header": "red"
+  },
+  "zoom": 1
+}
+
+
+:: \ Commit Code and Update Ticket {"position":"1650,1175","size":"100,100"}
+(set:$time to ($time+20))(replace:?time)[$time]
+
+You did it! You solved the problem, even though at times you ended up in some random area doing something you didn't plan on, such is the life of an engineer.
+
+''GOOD JOB!''
+
+(link: "Try Again to Improve Your Time")[(set: $time to 0)(goto: "Start Here")]
+
+
+:: Call the endpoint from Postman {"position":"1450,600","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+
+You fire up your Postman only to realize that you now need the Enterprise version to continue.
+
+[[Request Enterprise Postman from Admin]]
+[[Now see the value of SEE and spin your SEE workspace]]
+
+
+:: Check application logs {"position":"1075,950","size":"100,100"}
+(set:$time to ($time))(replace:?time)[$time]
+
+You have the option of running your application locally to view logs or doing your analysis in Splunk to see any trends:
+
+[[Locally->View Logs]] 
+[[Splunk]]
+
+
+
+
+
+:: Enter an IIQ request {"position":"925,1450","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+
+You enter your request and submit it. It says it has went to your manager for approval. That's great except your manager is out of the office.
+
+[[Wait until your manager is back in 2 days]]
+[[Reach out to other managers in the area]]
+
+
+:: Investigate the source code in GitHub {"position":"1650,925","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+
+You pull up github and navigate to your repo for //SuperGoodPizzaApp// only to receive a 401 error! Oh no you don't have access!
+
+[[Request to be added to the SuperGoodPizzaApp GH Team]]
+
+
+:: Look at the Splunk wiki {"position":"925,1300","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+
+The splunk wiki tells you that you need to be in your areas IIQ group to access your index.
+
+[[Enter an IIQ request]] 
+
+
+
+:: Now see the value of SEE and spin your SEE workspace {"position":"1050,450","size":"100,100"}
+(set:$time to ($time+5))(replace:?time)[$time]
+
+You log in to SEE and evyerything you need is available and works! You jump for joy as you no longer need track down all the software you need to develop!
+
+You fire up postman, use the request from the ticket, and verify you can recreate the issue receiving the same //503 Service Unavailable// error message from the ticket.
+
+[[Check application logs]] 
+
+
+:: Phone a teammate for help {"position":"675,1325","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+
+You call your teammate Bob, and he asks you a question first before you can ask yours. You spend an hour working through his issues, before you get to your problem. Bob tells you you need to be in the right group and points you to IIQ to get your access.
+
+[[Enter an IIQ request]]
+
+
+:: Reach out to other managers in the area {"position":"1100,1225","size":"100,100"}
+(set:$time to ($time+480))(replace:?time)[$time]
+
+After a day of back and forths, everyone figures out how to approve your request, just before your manager returns anyways. Now why did we need this again? Oh yeah looking at the logs!
+
+[[View Logs]] 
+
+
+:: Request Enterprise Postman from Admin {"position":"900,325","size":"100,100"}
+(set:$time to ($time+120))(replace:?time)[$time]
+
+Time passes and eventually you get the correct version of Postman pushed to your machine.
+
+You fire up postman, use the request from the ticket, and verify you can recreate the issue.
+
+[[Check application logs]] 
+
+
+:: Request to be added to the SuperGoodPizzaApp GH Team {"position":"1650,1050","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+
+Hooray! You request was approved! You are able to finally pull up the source code for the service call, as you review the Enum for ingredients you notice something about an ingredient from your ticket's request:
+
+Ticket request | Enum value
+sausag				|sausage
+
+They misspelled the ingredient name!
+
+All of that to discover a typo!
+
+You vow to never relive this and add code to handle this error more gracefully and output a useful log message to help those in the future!
+
+[[ Commit Code and Update Ticket]]
+
+
+:: Restart the application {"position":"1650,775","size":"100,100"}
+(set:$time to ($time+10*$restartCount))(replace:?time)[$time]
+
+Still seeing the same error for the ''///order//'' endpoint, but something tells you another restart may just do the trick...
+
+
+(if: $bootLooped is false)\
+[[Restart the application]] 
+
+(if: $bootLooped is true AND $livesRemaining > 0 )[
+	[[Verify the application in New Relic]]
+	[[You are feeling lucky... restart it one more time!->Restart the application]]
+]
+
+(if: $livesRemaining < 1)[
+GAME OVER! Although your optimism is appreciated, we should try more than just restarting :)
+
+(link: "Try Again to Improve Your Time")[(set: $time to 0)(goto: "Start Here")]
+]
+
+(if: $restartCount > 2)[
+(set: $bootLooped to true)
+]
+
+
+(set: $restartCount to $restartCount +1)
+(set: $livesRemaining to $livesRemaining -1)
+
+
+
+
+:: Splunk {"position":"950,1125","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+
+You navigate to Splunk to realize you don't have access to your areas index of //SuperGoodPizzaApp//. 
+
+What would you like to do next?
+
+
+[[Phone a teammate for help]]
+[[Look at the Splunk wiki]]
+
+
+(set: $searchedSplunk to true)
+
+
+:: Start Here [Header] {"position":"1200,575","size":"100,100"}
+You are a new member of the team and have been tasked with triage and defects to get up to speed on the application. Your application is a Service Provider for a REST based API that is proxied through Apigee. The application is responsible for placing pizza orders.
+
+Click bellow to pull your first ticket:
+
+(set: $bootLooped to false)
+(set: $restartCount to 1)
+(set: $livesRemaining to 5)
+(set: $searchedSplunk to false)
+
+[[Ticket 1: Endpoint Unavaible]]
+
+
+:: Ticket 1: Endpoint Unavaible {"position":"1200,725","size":"100,100"}
+(set:$time to ($time+1))(replace:?time)[$time]
+
+Your first ticket reads as follows:
+
+
+---
+We are trying to call your endpoint ''/order'' with the following payload:
+```
+    {
+      "order": {
+        "customer": {
+          "name": "Peter Quil",
+          "phone": "555-555-5555",
+          "address": "1234 Elm St, Springfield, IL 62701"
+        },
+        "items": [
+          {
+            "name": "pizza",
+            "size": "large",
+            "toppings": ["pepperoni", "mushrooms", "sasaug"]
+          }
+        ]
+      }
+    } 
+```
+
+and receiving the following error:
+
+//503 Service Unavailable//
+
+What do you want to try?
+
+[[Call the endpoint from Postman]]
+[[Check application logs]]
+[[Verify the application in New Relic]]
+
+
+
+:: Untitled Passage [header] {"position":"1200,250","size":"100,100"}
+(align:"==>")[(border:"solid")[(color:yellow)[Time spent: [(str:$time)]<time| Minutes]]]
+
+
+:: Verify the application in New Relic {"position":"1450,775","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+
+The application is up an running, however you notice the error count has increased around the //''/order''// endpoint recently.
+
+[[Check application logs]] 
+(if: $bootLooped is false)\
+[[Restart the application]]
+
+
+:: View Logs {"position":"1250,1150","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+
+Yes! Finally you can see the logs!
+
+(if: $searchedSplunk is true)[
+You were able to search the newly accessible //SuperGoodPizzaApp// index in Splunk. You can see that whenever this consumer calls, they get same exception:
+]
+
+(if: $searchedSplunk is false)[
+You spun up the application locally, and hit the endpoint with the sample payload from the ticket. You are now able to see the following exception:
+]
+
+//Exception: Unable to find ingredient "sasaug"//
+
+[[Investigate the source code in GitHub]]
+
+
+:: Wait until your manager is back in 2 days {"position":"1250,1300","size":"100,100"}
+(set:$time to ($time+960))(replace:?time)[$time]
+
+Your manager returns and approves your request!! Wait what were we doing? Oh yeah looking at the logs!
+
+(set: $hasSplunkAccess to true)
+
+[[View Logs]] 

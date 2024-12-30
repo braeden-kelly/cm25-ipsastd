@@ -1,0 +1,256 @@
+:: StoryTitle
+App Down
+
+
+:: StoryData
+{
+  "ifid": "0DDF4EF5-DC26-417B-9654-7EE691A654C8",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "Start",
+  "zoom": 1
+}
+
+
+:: 2.0.0 {"position":"900,1325","size":"100,100"}
+(set:$time to ($time+0))(replace:?time)[$time]
+
+You bump the version to 2.0.0 in pom.xml file.
+
+Choose your next step:
+
+[[Commit and deploy]]
+[[Test]]
+
+
+:: Attempt to read their mind {"position":"1025,625","size":"100,100"}
+(set:$time to ($time+60))(replace:?time)[$time]
+
+Despite your best efforts to channel your inner Professor X, you highly doubt your mind reading saying the app is down because you need a snack and coffee is accurate.
+
+[[Request more information]]
+
+
+:: Bump the version {"position":"1125,1200","size":"100,100"}
+(set:$time to ($time+20))(replace:?time)[$time]
+
+(if: $vOneTwoOneEight is true)[
+You bump the version, build, and attempt a deploy and the same error occurs! We need to bump the version to at least 2.0 to avoid this CVE.
+]
+
+You investiage artifactory to see which versions are available and find the following:
+
+
+* 1.2.18
+* 2.0.0
+
+Which version do you want update to?
+
+(if: $vOneTwoOneEight is false)\
+[[1.2.18->Bump the version]]
+[[2.0.0]]
+
+(set: $vOneTwoOneEight to true)
+
+
+:: Check New Relic {"position":"700,875","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+(set: $checkedNewRelic to true)
+
+You see the app metrics stopped sending at the time the restart was attempted, but nothing else.
+
+(if: $checkedLogs is false)\
+[[Check the logs]] 
+[[Investigate the pods further in Kubernetes]]
+
+
+:: Check the logs {"position":"1075,875","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+(set: $checkedLogs to true)
+
+You see that the logs stopped when they attempted to restart the application. Nothing suspicous or interesting to dig into
+
+(if: $checkedNewRelic is false)\
+[[Check New Relic]] 
+[[Investigate the pods further in Kubernetes]]
+
+
+:: Commit and deploy {"position":"900,1450","size":"100,100"}
+(if: $testedApp is false)[
+(set:$time to ($time+60))(replace:?time)[$time]
+Oh no!!! You made a typo in the pom file! Luckily you PR builds and test the app and caught this. However, now everyone on the team knows you don't test your changes before you commit them and you are added to the wall of shame. You correct your changes, test locally, and resubmit.
+
+
+<img src="../images/shame.webp"/>
+]
+
+(if: $testedApp is true)[
+(set:$time to ($time+5))(replace:?time)[$time]
+You commit your code. It passes all checks in the PR allowing it be merged into main. You kick off the deploy to get your code into an environment.
+]
+
+
+
+[[Validate deployment]]
+
+
+:: Describe the pod {"position":"900,1075","size":"100,100"}
+(set:$time to ($time+1))(replace:?time)[$time]
+
+You describe the pod and get the following:
+
+<img src="images/cve-scenario/describePods.png"/>
+
+Oh no! Blocked by a CVE! An unfortunate but very common occurence in our world. 
+
+What do you want to do now?
+
+[[Raise an exception]]
+[[Bump the version]]
+
+
+:: Investigate the pods further in Kubernetes {"position":"900,950","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+
+You recall your training for Kubernetes and pull up your handy dandy CLI and start exploring with //kubectl//
+
+First up, lets get the pods:
+
+<img src="images/cve-scenario/getPods.png"/>
+
+Yup there is the problem as described. Now what?
+
+[[Describe the pod]]
+[[Try increasing the replicas for the pod]]
+[[Try restarting the pod]]
+
+
+:: Raise an exception {"position":"900,1200","size":"100,100"}
+(set:$time to ($time+120))(replace:?time)[$time]
+
+You attempt to fill out an exception to allow your pods to start back up only to have it ''denied'' due to the criticality of this CVE and a fix being readily available.
+
+[[Bump the version]]
+
+
+:: Request more information {"position":"900,625","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+
+You have learned the basics of problem solving and now can effecitvely and politely ask for the information you need to dig into this problem. You send the following email:
+
+//Hello Fellow Teammate!
+
+I politely request the following information to further diagnose your issue:
+
+* How can I recreate this problem?
+* When did this problem start?
+* Is the entire application down or just an endpoint not working?
+* What information have you found from the logs/pods?
+//
+
+[[Send email]]
+
+
+:: Send email {"position":"900,750","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+
+Your teammate was a bit confused at first as to why you needed information to work with and why you could not indeed read their mind, but eventually dug into the problem to provided you with more information:
+
+* How can I recreate this problem?
+//Hit any endpoint //
+* When did this problem start?
+//After we restarted the pods in our test environment//
+* Is the entire application down or just an endpoint not working?
+//Whole thing is toast//
+* What information have you found from the logs/pods?
+//The pod has a ''RunContainerError'' when I do a ''kubectl get pods''//
+  
+  
+ The plot thickens and it appears we have a real doozy of a problem at hand.
+ 
+ 
+ [[Check the logs]]
+ [[Check New Relic]]
+ [[Investigate the pods further in Kubernetes]]
+
+
+:: Start {"position":"900,500","size":"100,100"}
+(set: $checkedLogs to false)
+(set: $checkedNewRelic to false)
+(set: $vOneTwoOneEight to false)
+(set: $testedApp to false)
+(set: $increasedPods to false)
+(set: $restartedPod to false)
+
+You are a developer on a Service Provider App which exposes several REST API endpoints that is deployed to a Kubernetes test environment.  Your REST APIs also have an Apigee Proxy that is a pass through to your app in kubernetes.  The Apigee Proxy handles normal items like logging and OAUTH validation.  You've recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
+
+You have received the coveted problem solving request as outlined below:
+
+//App is down, please help.//
+
+And so your journey begins :)
+
+[[Request more information]]
+[[Attempt to read their mind]]
+
+
+:: Test {"position":"1025,1450","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+
+(set: $testedApp to true)
+
+You go to start your app up locally only to realize it won't even build! What is going on?
+
+Upon looking at the build logs it says:  ''Cannot find the artifact log4j:2.0.0.0''
+
+Where did that extra ''.0'' come from? You accidentally typed it into the pom.xml.
+
+You correct your mistake.
+
+[[Commit and deploy]]
+
+
+:: TimerHeader [header] {"position":"1075,500","size":"100,100"}
+(align:"==>")[(border:"solid")[(color:yellow)[Time spent: [(str:$time)]<time| Minutes]]]
+
+
+:: Try increasing the replicas for the pod {"position":"750,1025","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+
+(set: $increasedPods to true)
+
+You increase the replicas on your kubernetes deployment, then do another ''kubectl get pods''. Now you have multiple pods all reporting the same error as the original error:
+
+//RunContainerError//
+
+What do you want to try now?
+
+(if: $restartedPod is false)\
+[[Try restarting the pods->Try restarting the pod]] 
+[[Describe the pods->Describe the pod]]
+
+
+:: Try restarting the pod {"position":"1125,1075","size":"100,100"}
+(set:$time to ($time+2))(replace:?time)[$time]
+
+(set: $restartedPod to true)
+
+You issue the ``kubectl delete pod`` command to delete the pod, upon doing so your kubernetes deployment kicks in and tried to start the pod back up in order to meet the agreed upon contract of replicas in the deployment. Upon doing so you see the new pod spinning up, however you see the familiar error of:
+
+''RunContainerError''
+
+[[Describe the pod]] 
+(if: $increasedPods is false)\
+[[Try increasing the replicas for the pod]]
+
+
+:: Validate deployment {"position":"900,1575","size":"100,100"}
+(set:$time to ($time+10))(replace:?time)[$time]
+
+You check the pod is up and running. You test the application is running in the environment and it all checks out. Splunk looks clean and New Relic shows a healthy app is running.
+
+Do a little dance and celebrate you did it!
+
+<img src="../images/cve-scenario/hansSalute.webp"/>
+
+(link: "Try Again to Improve Your Time")[(set: $time to 0)(goto: "Start")]
