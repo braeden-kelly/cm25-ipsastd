@@ -23,7 +23,7 @@ Choose your next step:
 [[Test]]
 
 
-:: Attempt to read their mind {"position":"1025,625","size":"100,100"}
+:: Attempt to read their mind {"position":"1050,625","size":"100,100"}
 (set:$time to ($time+60))(replace:?time)[$time]
 
 Despite your best efforts to channel your inner Professor X, you highly doubt your mind reading saying the app is down because you need a snack and coffee is accurate.
@@ -133,7 +133,7 @@ You attempt to fill out an exception to allow your pods to start back up only to
 [[Bump the version]]
 
 
-:: Request more information {"position":"900,625","size":"100,100"}
+:: Request more information {"position":"775,675","size":"100,100"}
 (set:$time to ($time+10))(replace:?time)[$time]
 
 You have learned the basics of problem solving and now can effecitvely and politely ask for the information you need to dig into this problem. You send the following email:
@@ -141,29 +141,34 @@ You have learned the basics of problem solving and now can effecitvely and polit
 //Hello Fellow Teammate!
 
 I politely request the following information to further diagnose your issue:
-
+*  In which environment are you testing?
+* What is the URL of the endpoint you are using?
+* Is the entire application down or just an endpoint not working?
 * How can I recreate this problem?
 * When did this problem start?
-* Is the entire application down or just an endpoint not working?
-* What information have you found from the logs/pods?
+* What have you done to try to troubleshoot this issue?
 //
 
 [[Send email]]
 
 
-:: Send email {"position":"900,750","size":"100,100"}
+:: Send email {"position":"950,750","size":"100,100"}
 (set:$time to ($time+10))(replace:?time)[$time]
 
 Your teammate was a bit confused at first as to why you needed information to work with and why you could not indeed read their mind, but eventually dug into the problem to provided you with more information:
 
+* In which environment are you testing?
+//In the test environment//
+* What is the URL of the endpoint you are using?
+// http://superapp-test.acme.net/customer/v2//
+* Is the entire application down or just an endpoint not working?
+//Whole thing is toast//
 * How can I recreate this problem?
 //Hit any endpoint //
 * When did this problem start?
-//After we restarted the pods in our test environment//
-* Is the entire application down or just an endpoint not working?
-//Whole thing is toast//
-* What information have you found from the logs/pods?
-//The pod has a ''RunContainerError'' when I do a ''kubectl get pods''//
+//After we restarted the containers in our test environment//
+* What have you done to try to troubleshoot this issue?
+// Ran ''kubectl get pods'' to see the running containers and there was an error that said ''RunContainerError'' 
   
   
  The plot thickens and it appears we have a real doozy of a problem at hand.
@@ -182,7 +187,7 @@ Your teammate was a bit confused at first as to why you needed information to wo
 (set: $increasedPods to false)
 (set: $restartedPod to false)
 
-You are a developer on a Service Provider App which exposes several REST API endpoints that is deployed to a Kubernetes test environment.  Your REST APIs also have an Apigee Proxy that is a pass through to your app in kubernetes.  The Apigee Proxy handles normal items like logging and OAUTH validation.  You've recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
+You are a developer on an application which exposes several REST API endpoints that is deployed to a Kubernetes environment.  Your REST APIs also have an proxy gateway that is a pass through to your app in kubernetes.  The  proxy handles normal items like logging and OAUTH validation.  You've recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
 
 You have received the coveted problem solving request as outlined below:
 
@@ -190,6 +195,7 @@ You have received the coveted problem solving request as outlined below:
 
 And so your journey begins :)
 
+[[Use Postman to test your application]]
 [[Request more information]]
 [[Attempt to read their mind]]
 
@@ -242,6 +248,15 @@ You issue the ``kubectl delete pod`` command to delete the pod, upon doing so yo
 [[Describe the pod]] 
 (if: $increasedPods is false)\
 [[Try increasing the replicas for the pod]]
+
+
+:: Use Postman to test your application {"position":"650,600","size":"100,100"}
+(set:$time to ($time+15))(replace:?time)[$time]
+
+You send a simple request to the app in production and find that it is working fine.   You go through several different requests using most methods like GET, POST, PUT, and DELETE, but still find no issue.  You feel you've wasted 15 minutes...
+
+[[Request more information]]
+[[Attempt to read their mind]]
 
 
 :: Validate deployment {"position":"900,1575","size":"100,100"}
