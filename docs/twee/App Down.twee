@@ -42,7 +42,7 @@ You see the app metrics stopped sending at the time the restart was attempted, b
 [[Investigate the pods further in Kubernetes]]
 
 
-:: Check the logs {"position":"1075,875","size":"100,100"}
+:: Check the logs {"position":"1100,825","size":"100,100"}
 (set:$time to ($time+2))(replace:?time)[$time]
 (set: $checkedLogs to true)
 
@@ -72,12 +72,12 @@ You commit your code. It passes all checks in the PR allowing it be merged into 
 [[Validate deployment]]
 
 
-:: Describe the pod {"position":"900,1075","size":"100,100"}
+:: Describe the pod {"position":"900,1075","size":"200,100"}
 (set:$time to ($time+1))(replace:?time)[$time]
 
 You describe the pod and get the following:
 
-<img src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/describePods.png"/>
+<img width=100% src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/describePods.png"/>
 
 Oh no! Blocked by a CVE present in your image! An unfortunate but very common occurence in our world. In this platform anytime that a Critical CVE is present in the container, it prevents it from starting up. Restarts in Kubernetes can happen for various reasons and CVEs are constantly being discovered.
 
@@ -89,15 +89,14 @@ What do you want to do now?
 (text-style:"italic","expand")[Note: CVE stands for Common Vulnerabilities and Exposures, a project that classifies and tracks publicly known information security vulnerabilities]
 
 
-:: Investigate the pods further in Kubernetes {"position":"900,950","size":"100,100"}
+:: Investigate the pods further in Kubernetes {"position":"900,950","size":"200,100"}
 (set:$time to ($time+2))(replace:?time)[$time]
 
 You pull up your handy dandy CLI and start exploring with //kubectl//
 
 First up, lets understand what we are working with, lets get the pods:
 
-<img src="images/cve-scenario/getPods.png"/>
-
+  <img width=100% src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/getPods.png"/>
 Yup there is the problem as described. Now what?
 
 [[Describe the pod]]

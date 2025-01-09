@@ -45,7 +45,7 @@ You see the app metrics stopped sending at the time the restart was attempted, b
 
 (if: $checkedLogs is false)\
 [[Check the logs]] 
-[[Investigate the pods further in Kubernetes]]</tw-passagedata><tw-passagedata pid="5" name="Check the logs" tags="" position="1075,875" size="100,100">(set:$time to ($time+2))(replace:?time)[$time]
+[[Investigate the pods further in Kubernetes]]</tw-passagedata><tw-passagedata pid="5" name="Check the logs" tags="" position="1100,825" size="100,100">(set:$time to ($time+2))(replace:?time)[$time]
 (set: $checkedLogs to true)
 
 You see that the logs stopped when they attempted to restart the application. Nothing suspicous or interesting to dig into
@@ -67,11 +67,11 @@ You commit your code. It passes all checks in the PR allowing it be merged into 
 
 
 
-[[Validate deployment]]</tw-passagedata><tw-passagedata pid="7" name="Describe the pod" tags="" position="900,1075" size="100,100">(set:$time to ($time+1))(replace:?time)[$time]
+[[Validate deployment]]</tw-passagedata><tw-passagedata pid="7" name="Describe the pod" tags="" position="900,1075" size="200,100">(set:$time to ($time+1))(replace:?time)[$time]
 
 You describe the pod and get the following:
 
-&lt;img src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/describePods.png&quot;/&gt;
+&lt;img width=100% src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/describePods.png&quot;/&gt;
 
 Oh no! Blocked by a CVE present in your image! An unfortunate but very common occurence in our world. In this platform anytime that a Critical CVE is present in the container, it prevents it from starting up. Restarts in Kubernetes can happen for various reasons and CVEs are constantly being discovered.
 
@@ -80,14 +80,13 @@ What do you want to do now?
 [[Raise an exception]]
 [[Update the Dependency]]
 
-(text-style:&quot;italic&quot;,&quot;expand&quot;)[Note: CVE stands for Common Vulnerabilities and Exposures, a project that classifies and tracks publicly known information security vulnerabilities]</tw-passagedata><tw-passagedata pid="8" name="Investigate the pods further in Kubernetes" tags="" position="900,950" size="100,100">(set:$time to ($time+2))(replace:?time)[$time]
+(text-style:&quot;italic&quot;,&quot;expand&quot;)[Note: CVE stands for Common Vulnerabilities and Exposures, a project that classifies and tracks publicly known information security vulnerabilities]</tw-passagedata><tw-passagedata pid="8" name="Investigate the pods further in Kubernetes" tags="" position="900,950" size="200,100">(set:$time to ($time+2))(replace:?time)[$time]
 
 You pull up your handy dandy CLI and start exploring with //kubectl//
 
 First up, lets understand what we are working with, lets get the pods:
 
-&lt;img src=&quot;images/cve-scenario/getPods.png&quot;/&gt;
-
+  &lt;img width=100% src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/getPods.png&quot;/&gt;
 Yup there is the problem as described. Now what?
 
 [[Describe the pod]]
