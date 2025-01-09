@@ -57,7 +57,7 @@ You see that the logs stopped when they attempted to restart the application. No
 Oh no!!! You made a typo in the pom file! Luckily you PR builds and test the app and caught this. However, now everyone on the team knows you don&#39;t test your changes before you commit them and you are added to the wall of shame. You correct your changes, test locally, and resubmit.
 
 
-&lt;img src=&quot;../images/shame.webp&quot;/&gt;
+&lt;img src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/shame.webp&quot;/&gt;
 ]
 
 (if: $testedApp is true)[
@@ -71,7 +71,7 @@ You commit your code. It passes all checks in the PR allowing it be merged into 
 
 You describe the pod and get the following:
 
-&lt;img src=&quot;images/cve-scenario/describePods.png&quot;/&gt;
+&lt;img src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/describePods.png&quot;/&gt;
 
 Oh no! Blocked by a CVE present in your image! An unfortunate but very common occurence in our world. In this platform anytime that a Critical CVE is present in the container, it prevents it from starting up. Restarts in Kubernetes can happen for various reasons and CVEs are constantly being discovered.
 
@@ -196,7 +196,7 @@ You check the pod is up and running. You test the application is running in the 
 
 Do a little dance and celebrate you did it!
 
-&lt;img src=&quot;../images/cve-scenario/hansSalute.webp&quot;/&gt;
+&lt;img src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/hansSalute.webp&quot;/&gt;
 
 (link: &quot;Try Again to Improve Your Time&quot;)[(set: $time to 0)(goto: &quot;Start&quot;)]</tw-passagedata></tw-storydata>
 <script title="Twine engine code" data-main="harlowe">(function(){"use strict";
