@@ -22,15 +22,14 @@ The search spins for several minutes and returns 0 results.
 
 You consider what to do next:
 
-[[- Search for "ERROR" level logs in Splunk-> Search for any logs of type "ERROR"]] 
-[[- Try something else.->Start Troubleshooting]]   
-
+[[- Search for "ERROR" level logs -> Search for any logs of type "ERROR"]] 
+[[- Try something else.->Start Troubleshooting]]
 
 
 :: \ Search for any logs of type "ERROR" {"position":"150,825","size":"100,100"}
 (set:$time to ($time+5))(replace:?time)[$time]
-(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Using Splunk is a great way to search through logs from all your different pods. One draw back of cloud based logging  is that by default each line in a log becomes an individual entry into Splunk.  This makes seeing continuous stack traces a little problematic.  If you search for an error log, you may see the starting exception, but not the stacktrace .]]]
-You use your Splunk skills to find all log entries of type "Error" for the past 4 hours.  
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Using a Log Aggregator is a great way to search through logs from all your different pods. One draw back of cloud based logging can be that by default each line in a log becomes an individual entry.  This makes seeing continuous stack traces a little problematic.  If you search for an error log, you may see the starting exception, but not the stacktrace .]]]
+You use your Log Searching skills to find all log entries of type "Error" for the past 4 hours.  
 You get back hundreds of results.
 
 You see several of the following:
@@ -59,12 +58,19 @@ After about 30 minutes, the tester replies back to you that they ran the tests a
 
 You consider what your next steps should be:
 
-[[Try something else->Start Troubleshooting]] 
+[[Try something else->Start Troubleshooting]]
+
+
+:: - Check Log Aggregator {"position":"325,625","size":"100,100"}
+You decide to go to your Log Aggregator to see if you can find more information to point to the root cause.
+
+[[ Search for "500 Internal Server" messages]]
+[[ Search for any logs of type "ERROR"]]
 
 
 :: - Check Pod logs {"position":"850,625","size":"100,100"}
 (set:$time to ($time+10))(replace:?time)[$time]
-(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Checking the pod logs directly can quickly get you a list of ordered logs and a quick complete picture for what's going on.  The draw back is without using a log aggregator (like Splunk) it can be more difficult to filter or search through the logs.  Also, if you have multiple pods it may take time to go through the logs from all the pods.  However, in a serious outage like this that seems to be impacting all tests, then it's highly likely you'll find the same errors across all the logs.  So, in this scenario it pays to jump straight to the pod logs.]]]
+(if:$showHelp is True)[(border:"solid")[(color:red)[Tips:] (color:blue)[Checking the pod logs directly can quickly get you a list of ordered logs and a quick complete picture for what's going on.  The draw back is without using a Log Aggregator it can be more difficult to filter or search through the logs.  Also, if you have multiple pods it may take time to go through the logs from all the pods.  However, in a serious outage like this that seems to be impacting all tests, then it's highly likely you'll find the same errors across all the logs.  So, in this scenario it pays to jump straight to the pod logs.]]]
 
 You use your kubectl and command line skills to grab the test environment logs from one of the pods. Rifling through the logs you see an exception and stack trace that stands out.  
 
@@ -96,33 +102,17 @@ You consider what to do next...
 [[- Test the Application Locally]] 
 [[- Google the "CannotCreateTransactionException"]]
 [[- Test Connectivity to Database]]
-[[- Check Splunk logs]] 
-
-
-
-
-
-
-:: - Check Splunk logs {"position":"325,625","size":"100,100"}
-You decide to go to splunk to see if you can find more information to point to the root cause.
-
-[[ Search for "500 Internal Server" messages]]
-[[ Search for any logs of type "ERROR"]]
-
+[[- Check Log Aggregator]]
 
 
 :: - Check the app logs in the test environment {"position":"525,525","size":"100,100"}
 You decide it would be good to see if there are any errors or messages in the app logs to help you get to the root of the issue.
 
-You know you can check the logs in Splunk which allows you to search  through vast amounts of logs or you could check the current Pod logs either through Rancher or Kubectl commands to get real time logs.
+You know you can check the logs in your Log Aggregator which allows you to search  through vast amounts of logs or you could check the current Pod logs either through Rancher or Kubectl commands to get real time logs.
 
 
-[[- Check Splunk logs]]
+[[- Check Log Aggregator]]
 [[- Check Pod logs]]
-
-
-
-
 
 
 :: - Google the "CannotCreateTransactionException" {"position":"900,825","size":"100,100"}
@@ -168,7 +158,6 @@ Do you...
 Actual StackOverflow post: https://stackoverflow.com/questions/20907206/could-not-open-jpa-entitymanager-for-transaction-nested-exception-is-java-lang
 
 
-
 :: - Google the first "SqlExceptionHelper" exception {"position":"225,1025","size":"100,100"}
 (set:$time to ($time+5))(replace:?time)[$time]
 You Google the phrase from the log (color:blue)["SqlExceptionHelper : HikariPool-1 - Connection is not available, request timed out after"]
@@ -195,7 +184,7 @@ YML configuration example:"]
       leakDetectionThreshold: 300000]]
 
 You consider this and decide what to do next...
-[[-Google Second Splunk Error]]
+[[-Google Second Error from Logs]]
 [[- Increase the "connectionTimeout" setting]]
 [[- Restart the application]] 
 [[- Try Something Else->Start Troubleshooting]] 
@@ -219,14 +208,9 @@ What do you do?
 
 [[- Ask the tester to test again->- Ask tester to test again]]
 [[- Increase the "connectionTimeout" to an even higher value->- Increase the "connectionTimeout" setting]]
-[[- Check Splunk logs]] 
+[[- Check Log Aggregator]] 
 [[- Check Pod logs]]
-[[- Try Something Else->Start Troubleshooting]] 
-
-
-
-
-
+[[- Try Something Else->Start Troubleshooting]]
 
 
 :: - Restart the application {"position":"400,375","size":"100,100"}
@@ -239,9 +223,7 @@ What do you do next?
 [[- Ask tester to test again]] 
 [[- Send a request through Postman yourself]]
 [[- Check the app logs in the test environment]] 
-[[- Test the Application Locally]] 
-
-
+[[- Test the Application Locally]]
 
 
 :: - Send a request through Postman yourself {"position":"925,450","size":"100,100"}
@@ -269,7 +251,7 @@ You run a test through Postman and find that it is working!
 
 You ask the tester to test again and the tester pings you back after a few minutes with praise and adoration for fixing the test environment!
 
-<img src="..images/wonkayoudidit.gif"/>
+<img src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/wonkayoudidit.gif"/>
 
 (link: "Try Again to Improve Your Time")[(set: $time to 0)(goto: "Start Troubleshooting")]
 
@@ -312,16 +294,7 @@ You consider what to do next...
 [[- Test Connectivity to Database]]
 
 
-
-
-
-
-
-
-
-
-
-:: -Google Second Splunk Error {"position":"550,1125","size":"100,100"}
+:: -Google Second Error from Logs {"position":"550,1125","size":"100,100"}
 (set:$time to ($time+10))(replace:?time)[$time]
 You google for the error phrase (color:red)["SqlExceptionHelper : Communications link failure"]
 
@@ -343,16 +316,16 @@ However there is a link at the very top of the post that says, "This question al
 
 You consider what to do next...
 
-[[- Follow the link at the top of the StackOverflow post->Good StackOverflow post followed from Splunk]]
+[[- Follow the link at the top of the StackOverflow post->Good StackOverflow post followed from Logs]]
 [[- Restart the application]]
-[[- Try something else->Start Troubleshooting]] 
+[[- Try something else->Start Troubleshooting]]
 
 
 :: App Overview {"position":"425,75","size":"100,100"}
-Your a developer on a Service Provider application that provides a REST based API that is proxied through Apigee. The application is responsible for placing pizza orders. 
+Your a developer on a Service Provider application that provides a REST based API that is proxied through an API Gateway. The application is responsible for placing pizza orders. 
 
 Here is an architectural overview of the app.
-<img src="..images/common/AppArchDesign.png"/>
+<img width=100% src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/common/AppArchitecture.png"/>
 
 (border:"solid")+(border-color:red)[(color:red)[Problem to Solve:]
 You get a Teams message from a tester that says the service provider app in the test environment is failing nearly all the tests.]
@@ -414,7 +387,7 @@ You consider what to do next...
 [[- Restart the application]]
 
 
-:: Good StackOverflow post followed from Splunk {"position":"650,1375","size":"100,100"}
+:: Good StackOverflow post followed from Logs {"position":"650,1375","size":"100,100"}
 (set:$time to ($time+5))(replace:?time)[$time]
 You decide to follow the link at the top of the StackOverflow post that says the question about the CommunicationsException has already been answered.
 
@@ -443,7 +416,7 @@ To solve the one or the other, follow the following advices:
 You consider your next steps carefully...
 
 [[- Restart the application]]
-[[- Go Back to Splunk Logs-> Search for any logs of type "ERROR"]] 
+[[- Go Back to Searching the Logs-> Search for any logs of type "ERROR"]] 
 [[- Test Connectivity to Database]]
 [[- Try Something Else->Start Troubleshooting]] 
 
@@ -463,7 +436,6 @@ https://stackoverflow.com/questions/6865538/solving-a-communications-link-failur
 
 (link: "reset timer")[(set: $time to 0)(goto: "Start Troubleshooting")]
 (link: "enable help")[(set: $showHelp to True)(goto: "Start Troubleshooting")]
-
 
 
 :: TimerHeader [header] {"position":"600,0","size":"100,100"}
@@ -492,9 +464,6 @@ You realize this answer is for a different problem and decide to do something el
 [[- Look the second search result from Google->Correct Article On Error]] 
 [[- Go back to App Logs->- Check Pod logs]]
 [[- Go a different Path->Start Troubleshooting]] 
-
-
-
 
 
 https://stackoverflow.com/questions/20907206/could-not-open-jpa-entitymanager-for-transaction-nested-exception-is-java-lang
