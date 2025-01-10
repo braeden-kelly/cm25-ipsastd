@@ -11,7 +11,7 @@
 <tw-story><noscript><tw-noscript>JavaScript needs to be enabled to play Problem Solving.</tw-noscript></noscript></tw-story>
 <tw-storydata name="Problem Solving" startnode="7" creator="Twine" creator-version="2.10.0" format="Harlowe" format-version="3.3.9" ifid="D8566BC0-4C9F-421C-930C-1B8286167BFC" options="" tags="" zoom="1" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Check Another Consumer" tags="" position="1125,650" size="100,100">(set:$time to ($time+45))(replace:?time)[$time]
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[In this scenario, checking if another team is also experiencing issues, may not be the worst idea, but it does require you to reach out and disturb another team, when you could most likely run a test more quickly yourself. If you are unable to reproduce the problem after some time, then it may be appropriate to reach out to another team to get more data on what is causing the issue.  But initially, your time is probably best spent getting the exact test data and URL from the consumer having issues so you can reproduce the issue yourself.  ]]
-You reach out to (if: $consumerCount is 0)[Joslin](else:)[Margo] from who is a tester from another app team that consumes your API.  You ask (if: $consumerCount is 0)[Joslin](else:)[Margo] if her team has noticed any issues with your API and if she can run a quick test against your endpoint.  About (if: $consumerCount is 0)[45](else:)[(text:65 + ($consumerCount * 10))] minutes later, she sends you a message that everything is working fine from what she can see.
+You reach out to (if: $consumerCount is 0)[Joslin](else:)[Margo] who is a tester from another app team that consumes your API.  You ask (if: $consumerCount is 0)[Joslin](else:)[Margo] if her team has noticed any issues with your API and if she can run a quick test against your endpoint.  About (if: $consumerCount is 0)[45](else:)[(text:65 + ($consumerCount * 10))] minutes later, she sends you a message that everything is working fine from what she can see.
 
 Not discovering any new helpful information, you consider your next move. 
 [[Try something else.-&gt;Trouble Shoot]] 
@@ -131,7 +131,7 @@ You tell the consumer their issue is using the wrong payload with the version of
 
 They realize their mistake is that they forgot to update the URLin their configs to use the new V2 version of the API in their latest deployment.  They thank you for quickly finding their issue and heap mounds of praise upon you!
 
-&lt;img src=&quot;..images/pythonMuchRejoicing.gif&quot;/&gt;
+&lt;img src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/pythonMuchRejoicing.gif&quot;/&gt;
 
 (set: $showHelp to true)\
 (set: $hasCheckedOtherConsumer to false)\
