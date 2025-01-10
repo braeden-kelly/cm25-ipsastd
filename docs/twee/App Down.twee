@@ -78,6 +78,7 @@ You commit your code. It passes all checks in the PR allowing it be merged into 
 You describe the pod and get the following:
 
 <img width=100% src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/describePods.png"/>
+(zoom for more details of the command)
 
 Oh no! Blocked by a CVE present in your image! An unfortunate but very common occurence in our world. In this platform anytime that a Critical CVE is present in the container, it prevents it from starting up. Restarts in Kubernetes can happen for various reasons and CVEs are constantly being discovered.
 
