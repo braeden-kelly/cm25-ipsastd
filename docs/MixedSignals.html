@@ -17,7 +17,7 @@ Not discovering any new helpful information, you consider your next move.
 [[Try something else.-&gt;Trouble Shoot]] 
 
 (set: $consumerCount to it + 1)</tw-passagedata><tw-passagedata pid="2" name="Check App Logs" tags="" position="900,525" size="100,100">(set:$time to ($time+25))(replace:?time)[$time]
-(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Digging through the app logs right away may waste valuable time if the issue isn&#39;t causing an exception or stacktrace in your app logs.  Also, digging through logs, depending on the log level, may take time and send you chasing after errors that weren&#39;t the cause of the consumer reporting the issue.   It&#39;s not uncommon to see regular warning or error messages in app logs based on bad test data from consumers or developers.   When you aren&#39;t sure if there is a problem with your back end application, your time may be better spent first isolating where the error is coming from (backend app, apigee proxy, or bad data) and reproducing the error.  Once you are able to reproduce the error and it seems likely the error is caused by the backend application, then at that point it makes sense to check the app logs.]]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Digging through the app logs right away may waste valuable time if the issue isn&#39;t causing an exception or stacktrace in your app logs.  Also, digging through logs, depending on the log level, may take time and send you chasing after errors that weren&#39;t the cause of the consumer reporting the issue.   It&#39;s not uncommon to see regular warning or error messages in app logs based on bad test data from consumers or developers.   When you aren&#39;t sure if there is a problem with your back end application, your time may be better spent first isolating where the error is coming from (backend app, api proxy, or bad data) and reproducing the error.  Once you are able to reproduce the error and it seems likely the error is caused by the backend application, then at that point it makes sense to check the app logs.]]
 You go to your Log Aggregator site and spend a few minutes crafting a search to find errors or exceptions that happened in the past day.  Your logging level in this test environment is pretty verbose so it takes several minutes to return results.  You see a few odd errors and warning messages, but nothing that jumps out as the definitive issue.   
 
 Not seeing an obvious issue after spending 20 minutes in the logs, you consider what to do next.
@@ -26,9 +26,9 @@ Not seeing an obvious issue after spending 20 minutes in the logs, you consider 
 [[- Dig deeper into the error messages you see in the logs.-&gt;Dig Into False Errors]]
 [[- Try something else.-&gt;Trouble Shoot]]</tw-passagedata><tw-passagedata pid="3" name="Check URL" tags="" position="1225,200" size="100,100">(set:$time to ($time+10))(replace:?time)[$time]
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[If you are not the first to produce the error, getting the exact parameters to produce the error is a good first step.  Also, getting the actual error message is huge.  It&#39;s amazing how many times the error message or stacktrace points to the root of the issue.  In this case the 400 Error literally  means &quot;Bad Request&quot; which turns out to be the issue in this scenario.  That is, it&#39;s a bad request for the URL they are using.]]
-You attempt to get more specific information as to what exact endpoint they are hitting and what the error message is.  You reach out to the consumer asking to confirm the url they are using when seeing the error and if they can send you the error message. They respond back that the error is a &quot;400 Bad Request&quot; and you notice the URL is an apigee internal url to your V1 endpoint:
+You attempt to get more specific information as to what exact endpoint they are hitting and what the error message is.  You reach out to the consumer asking to confirm the url they are using when seeing the error and if they can send you the error message. They respond back that the error is a &quot;400 Bad Request&quot; and you notice the URL is to your V1 endpoint:
 
-&lt;img src=&quot;..images/URL.PNG&quot;/&gt;
+(b4r:&quot;solid&quot;)+(b4r-size:2)+(b4r-colour:white)[(text-style:&quot;expand&quot;)[&#39;&#39;https://api-gateway.my-company.com/amazing-capability/resource/v1&#39;&#39;]]
 
 [[- Use one of your saved V1 test payloads to hit the endpoint-&gt;Hit URL]] 
 [[- Ask the consumer to send you the payload request they are using that is having issues.-&gt;Use Consumer Payload and URL]]
@@ -49,15 +49,17 @@ Using one of your saved V1 tests in Postman, you hit the V1 version of the servi
 
 Not being able to reproduce the issue, you consider what to do next. 
 
-[[Try something else.-&gt;Trouble Shoot]]</tw-passagedata><tw-passagedata pid="7" name="Scenario 1" tags="" position="775,150" size="100,100">You are a developer on a Service Provider App which exposes several REST API endpoints that is deployed to a Kubernetes test environment.  Your REST APIs also have an Apigee Proxy that is a pass through to your app in kubernetes.  The Apigee Proxy handles normal items like logging and OAUTH validation.  You&#39;ve recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
+[[Try something else.-&gt;Trouble Shoot]]</tw-passagedata><tw-passagedata pid="7" name="Scenario 1" tags="" position="775,150" size="100,100">You are a developer on a Service Provider App which exposes several REST API endpoints that is deployed to a Kubernetes test environment.  Your REST APIs also have an Api Proxy that is a pass through to your app in kubernetes.  The API Proxy handles normal items like logging and OAUTH validation.  You&#39;ve recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
 
 Here is an architectural overview of the app.
-&lt;img src=&quot;..images/common/AppArchDesign.png&quot;/&gt;
+&lt;img width=100% src=&quot;https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/common/AppArchitecture.png&quot;/&gt;
 
 (border:&quot;solid&quot;)+(border-color:red)[(color:red)[Problem to Solve:]
 A consumer of your REST API reaches out to you and says they are getting errors accessing your API in the test environment. That is all the information you&#39;ve been given. You must now consider what&#39;s the best option to get to the root of the problem.]
 
 [[Start Troubleshooting-&gt;Trouble Shoot]]  
+
+(link: &quot;enable help&quot;)[(set: $showHelp to true)(goto: &quot;Trouble Shoot&quot;)]
 
 (set: $hasCheckedOtherConsumer to false)
 (set: $hasPayload to false)
@@ -69,11 +71,7 @@ A consumer of your REST API reaches out to you and says they are getting errors 
 (set:$time to 0)
 
 
-
-
-
-
-(link: &quot;enable help&quot;)[(set: $showHelp to true)(goto: &quot;Trouble Shoot&quot;)]</tw-passagedata><tw-passagedata pid="8" name="Log Search Shorter" tags="" position="700,625" size="100,100">(set:$time to ($time+10))(replace:?time)[$time]
+</tw-passagedata><tw-passagedata pid="8" name="Log Search Shorter" tags="" position="700,625" size="100,100">(set:$time to ($time+10))(replace:?time)[$time]
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Digging through less logs is a good idea, but if you don&#39;t know if the app is throwing an error or is the root cause, then you may look in vain.  Even if you find errors, it can be hard to determine if they are the cause of the reported issue if you can&#39;t reproduce the issue.]]
 You reach out to the consumer and ask if they can give you a date/time of the last time they saw the issue.  They give you the specific time of the last time they tested.  You run your search again, but this time with a smaller time window to see less logs.  Again you see  a few odd errors and warnings, but the search returns faster this time. You do notice an error around parsing a request that seems intriguing. 
 
@@ -83,12 +81,12 @@ You tried to decide what to do next...
 [[- Try something else.-&gt;Trouble Shoot]] 
 
 (set: $knowErrorTimeFrame to true)</tw-passagedata><tw-passagedata pid="9" name="Test Private Endpoint" tags="" position="600,325" size="100,100">(set:$time to ($time+5))(replace:?time)[$time]
-(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Doing a quick test against your backend service in an isolated way by bypassing Apigee is not a bad idea.  Being able to quickly verify your back end is up and running is a good idea when there is a reported issue.  In this scenario, it turns out that your backend is up and running just fine, but if you are able to do a quick test to verify your backend is up and running, this saves you from having to dig into logs or find out what&#39;s wrong with the backend when there really isn&#39;t an issue there. ]]
-In an effort to see if you can quickly reproduce the issue, you decide to use one of your existing saved Postman tests to hit the (if:$hasURL)[V1 endpoint](else:)[latest V2 endpoint] in your test environment.  You grab a test payload and use postman to hit your direct endpoint bypassing Apigee to your service provider app in the test environment.  You get a successful response.  
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Doing a quick test against your backend service in an isolated way by bypassing API Gateway is not a bad idea.  Being able to quickly verify your back end is up and running is a good idea when there is a reported issue.  In this scenario, it turns out that your backend is up and running just fine, but if you are able to do a quick test to verify your backend is up and running, this saves you from having to dig into logs or find out what&#39;s wrong with the backend when there really isn&#39;t an issue there. ]]
+In an effort to see if you can quickly reproduce the issue, you decide to use one of your existing saved Postman tests to hit the (if:$hasURL)[V1 endpoint](else:)[latest V2 endpoint] in your test environment.  You grab a test payload and use postman to hit your direct endpoint bypassing the API Gateway to your service provider app in the test environment.  You get a successful response.  
 
 Not seeing any issue using your sample request against the private endpoint you consider what to try next. 
 
-[[- Test your endpoint through Apigee-&gt;Test through Apigee With Test Request]]
+[[- Test your endpoint through API Gateway-&gt;Test through API Gateway With Test Request]]
 [[- Try something else.-&gt;Trouble Shoot]]</tw-passagedata><tw-passagedata pid="10" name="Test With Consumer Payload" tags="" position="1200,450" size="100,100">(set:$time to ($time+10))(replace:?time)[$time]
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[If you are not the first to produce the error, getting the exact parameters to produce the error is a good first step.  So, it&#39;s always good to get the data/input being used to produce the issue. Sometimes, the issue is directly related to the type or format of the data coming through.  It turns out in this scenario that the request data was the issue because it was the wrong input for the URL they were using.  But even if it wasn&#39;t the root cause, it&#39;s a good first step to get the data being tested with that&#39;s causing the issue.  This way you are chasing the same issue as the one reporting the problem and not accidently introducing new variables or other issues.]]
 In an attempt to get more specific context around how they are testing, you ask the consumer for the payload request they are using to call your service.  Upon receiving the payload, you recognize it as a newer V2 service request message.  You therefore run a test against the V2 version of your service in the test environment and get back a successfull response.
@@ -99,13 +97,14 @@ Since their request works fine when testing the V2 service in the test environme
 [[- Consider other options-&gt;Trouble Shoot]] 
 
 
-(set: $hasPayload to true)</tw-passagedata><tw-passagedata pid="11" name="Test through Apigee With Test Request" tags="" position="650,475" size="100,100">(set:$time to ($time+5))(replace:?time)[$time]
-(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[After verifying that the backend is working for your simple test, validating the Apigee proxy is a good next move.  It turns out, in this case, that your proxy and backend are working as expected.  But being able to quickly rule out obvious major issues with the proxy is not a bad call. ]]
-You now decide to try to test more like the consumer by calling through Apigee. You pull up your saved Postman collection to test against your internal apigee endpoint for the (if:$hasURL)[V1](else:)[V2] using a saved payload you&#39;ve used before. The request goes through just fine and you get a successful response.
+(set: $hasPayload to true)</tw-passagedata><tw-passagedata pid="11" name="Test through API Gateway With Test Request" tags="" position="650,475" size="100,100">(set:$time to ($time+5))(replace:?time)[$time]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[After verifying that the backend is working for your simple test, validating the API proxy is a good next move.  It turns out, in this case, that your proxy and backend are working as expected.  But being able to quickly rule out obvious major issues with the proxy is not a bad call. ]]
+You now decide to try to test more like the consumer by calling through the API Gateway. You pull up your saved Postman collection to test against your API Gateway endpoint for the (if:$hasURL)[V1](else:)[V2] using a saved payload you&#39;ve used before. The request goes through just fine and you get a successful response.
 
 Not finding any issue, you consider what to do next...
 
-[[Try something else.-&gt;Trouble Shoot]]</tw-passagedata><tw-passagedata pid="12" name="TimeHeader" tags="header" position="975,125" size="100,100">(align:&quot;==&gt;&quot;)[(border:&quot;solid&quot;)[(color:yellow)[Time spent: [(str:$time)]&lt;time| Minutes]]]</tw-passagedata><tw-passagedata pid="13" name="Trouble Shoot" tags="" position="950,350" size="100,100">(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[It&#39;s very challenging to troubleshoot an issue unless you can reproduce the issue.  If instead of reproducing the issue, you simply start checking logs or make assumptions, you may get lucky, but most problems in complex environments aren&#39;t so easy and so it&#39;s better to figure out how to reproduce the problem so you can quickly get to the root.  So, think about the fastest way to reproduce the issue. Usually it involves understanding the context around the issue.  That is what are the exact conditions that are causing the issue and then how to isolate different parts of the system to figure out where the problem lies.]]
+[[Try something else.-&gt;Trouble Shoot]]</tw-passagedata><tw-passagedata pid="12" name="TimeHeader" tags="header" position="975,125" size="100,100">(align:&quot;==&gt;&quot;)[(border:&quot;solid&quot;)[(color:yellow)[Time spent: [(str:$time)]&lt;time| Minutes]]]
+</tw-passagedata><tw-passagedata pid="13" name="Trouble Shoot" tags="" position="950,350" size="100,100">(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[It&#39;s very challenging to troubleshoot an issue unless you can reproduce the issue.  If instead of reproducing the issue, you simply start checking logs or make assumptions, you may get lucky, but most problems in complex environments aren&#39;t so easy and so it&#39;s better to figure out how to reproduce the problem so you can quickly get to the root.  So, think about the fastest way to reproduce the issue. Usually it involves understanding the context around the issue.  That is what are the exact conditions that are causing the issue and then how to isolate different parts of the system to figure out where the problem lies.]]
 
 (if:$showHelp is false)[(color:red)[NOTE:](color:white)[ As you go through this scenario, some options may lead you back to this page to try another path.  Some paths may disappear upon trying them once. Other paths may remain, but may change depending on paths you went down previously.]]
 
@@ -113,23 +112,13 @@ Not finding any issue, you consider what to do next...
 [[- Ask what URL the consumer is using and what is the error?-&gt;Check URL]]\
 (if: $hasURL is true AND $hasPayload is true)\
 [[- Test with Consumer&#39;s Payload and URL.-&gt;Use Consumer Payload and URL]]
-[[- Bypass Apigee to test  your service provider directly.-&gt;Test Private Endpoint]]
+[[- Bypass API Gateways to test  your service provider directly.-&gt;Test Private Endpoint]]
 (if: $hasPayload is false)\
 [[- Ask the consumer for the request data they are using and test with it.-&gt;Test With Consumer Payload]]
 [[- Ask a different consumer of the service to check if the service is working.-&gt;Check Another Consumer]]
 [[- Check the app logs for errors or exceptions.-&gt;Check App Logs]]
 
-
-
-
-
-
-
-
-
-
-
-(link: &quot;enable help&quot;)[(set: $showHelp to true)(goto: &quot;Trouble Shoot&quot;)]</tw-passagedata><tw-passagedata pid="14" name="Use Consumer Payload and URL" tags="" position="1275,700" size="100,100">(set:$time to ($time+5))(replace:?time)[$time]
+(link: &quot;enable help&quot;)[(set: $showHelp to true)(goto: &quot;Trouble Shoot&quot;)] </tw-passagedata><tw-passagedata pid="14" name="Use Consumer Payload and URL" tags="" position="1275,700" size="100,100">(set:$time to ($time+5))(replace:?time)[$time]
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue) [Having the actual url and the request that was used to produce the issue turned out to be key in this scenario.  Because it turned out while each was &quot;correct&quot; alone, but, together, the url with the request was not correct.  Typically URL&#39;s for api endpoints are injected through environment variables or properties files at deployment time.  It&#39;s not uncommon for someone to make a mistake and not update the correct config to change a setting like this.  So, it&#39;s not at all uncommon to find a mismatch between configs and code deployed to an environment.]]
 
 

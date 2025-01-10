@@ -25,7 +25,7 @@ Not discovering any new helpful information, you consider your next move.
 
 :: Check App Logs {"position":"900,525","size":"100,100"}
 (set:$time to ($time+25))(replace:?time)[$time]
-(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Digging through the app logs right away may waste valuable time if the issue isn't causing an exception or stacktrace in your app logs.  Also, digging through logs, depending on the log level, may take time and send you chasing after errors that weren't the cause of the consumer reporting the issue.   It's not uncommon to see regular warning or error messages in app logs based on bad test data from consumers or developers.   When you aren't sure if there is a problem with your back end application, your time may be better spent first isolating where the error is coming from (backend app, apigee proxy, or bad data) and reproducing the error.  Once you are able to reproduce the error and it seems likely the error is caused by the backend application, then at that point it makes sense to check the app logs.]]
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Digging through the app logs right away may waste valuable time if the issue isn't causing an exception or stacktrace in your app logs.  Also, digging through logs, depending on the log level, may take time and send you chasing after errors that weren't the cause of the consumer reporting the issue.   It's not uncommon to see regular warning or error messages in app logs based on bad test data from consumers or developers.   When you aren't sure if there is a problem with your back end application, your time may be better spent first isolating where the error is coming from (backend app, api proxy, or bad data) and reproducing the error.  Once you are able to reproduce the error and it seems likely the error is caused by the backend application, then at that point it makes sense to check the app logs.]]
 You go to your Log Aggregator site and spend a few minutes crafting a search to find errors or exceptions that happened in the past day.  Your logging level in this test environment is pretty verbose so it takes several minutes to return results.  You see a few odd errors and warning messages, but nothing that jumps out as the definitive issue.   
 
 Not seeing an obvious issue after spending 20 minutes in the logs, you consider what to do next.
@@ -38,9 +38,9 @@ Not seeing an obvious issue after spending 20 minutes in the logs, you consider 
 :: Check URL {"position":"1225,200","size":"100,100"}
 (set:$time to ($time+10))(replace:?time)[$time]
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[If you are not the first to produce the error, getting the exact parameters to produce the error is a good first step.  Also, getting the actual error message is huge.  It's amazing how many times the error message or stacktrace points to the root of the issue.  In this case the 400 Error literally  means "Bad Request" which turns out to be the issue in this scenario.  That is, it's a bad request for the URL they are using.]]
-You attempt to get more specific information as to what exact endpoint they are hitting and what the error message is.  You reach out to the consumer asking to confirm the url they are using when seeing the error and if they can send you the error message. They respond back that the error is a "400 Bad Request" and you notice the URL is an apigee internal url to your V1 endpoint:
+You attempt to get more specific information as to what exact endpoint they are hitting and what the error message is.  You reach out to the consumer asking to confirm the url they are using when seeing the error and if they can send you the error message. They respond back that the error is a "400 Bad Request" and you notice the URL is to your V1 endpoint:
 
-<img src="..images/URL.PNG"/>
+(b4r:"solid")+(b4r-size:2)+(b4r-colour:white)[(text-style:"expand")[''https://api-gateway.my-company.com/amazing-capability/resource/v1'']]
 
 [[- Use one of your saved V1 test payloads to hit the endpoint->Hit URL]] 
 [[- Ask the consumer to send you the payload request they are using that is having issues.->Use Consumer Payload and URL]]
@@ -90,15 +90,17 @@ You tried to decide what to do next...
 
 
 :: Scenario 1 {"position":"775,150","size":"100,100"}
-You are a developer on a Service Provider App which exposes several REST API endpoints that is deployed to a Kubernetes test environment.  Your REST APIs also have an Apigee Proxy that is a pass through to your app in kubernetes.  The Apigee Proxy handles normal items like logging and OAUTH validation.  You've recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
+You are a developer on a Service Provider App which exposes several REST API endpoints that is deployed to a Kubernetes test environment.  Your REST APIs also have an Api Proxy that is a pass through to your app in kubernetes.  The API Proxy handles normal items like logging and OAUTH validation.  You've recently deployed a new V2 version of your REST API which adds a few new fields, which are required, to some requests and updated responses compared to the V1 services which is still available.
 
 Here is an architectural overview of the app.
-<img src="..images/common/AppArchDesign.png"/>
+<img width=100% src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/common/AppArchitecture.png"/>
 
 (border:"solid")+(border-color:red)[(color:red)[Problem to Solve:]
 A consumer of your REST API reaches out to you and says they are getting errors accessing your API in the test environment. That is all the information you've been given. You must now consider what's the best option to get to the root of the problem.]
 
 [[Start Troubleshooting->Trouble Shoot]]  
+
+(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")]
 
 (set: $hasCheckedOtherConsumer to false)
 (set: $hasPayload to false)
@@ -113,18 +115,14 @@ A consumer of your REST API reaches out to you and says they are getting errors 
 
 
 
-
-(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")]
-
-
 :: Test Private Endpoint {"position":"600,325","size":"100,100"}
 (set:$time to ($time+5))(replace:?time)[$time]
-(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Doing a quick test against your backend service in an isolated way by bypassing Apigee is not a bad idea.  Being able to quickly verify your back end is up and running is a good idea when there is a reported issue.  In this scenario, it turns out that your backend is up and running just fine, but if you are able to do a quick test to verify your backend is up and running, this saves you from having to dig into logs or find out what's wrong with the backend when there really isn't an issue there. ]]
-In an effort to see if you can quickly reproduce the issue, you decide to use one of your existing saved Postman tests to hit the (if:$hasURL)[V1 endpoint](else:)[latest V2 endpoint] in your test environment.  You grab a test payload and use postman to hit your direct endpoint bypassing Apigee to your service provider app in the test environment.  You get a successful response.  
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Doing a quick test against your backend service in an isolated way by bypassing API Gateway is not a bad idea.  Being able to quickly verify your back end is up and running is a good idea when there is a reported issue.  In this scenario, it turns out that your backend is up and running just fine, but if you are able to do a quick test to verify your backend is up and running, this saves you from having to dig into logs or find out what's wrong with the backend when there really isn't an issue there. ]]
+In an effort to see if you can quickly reproduce the issue, you decide to use one of your existing saved Postman tests to hit the (if:$hasURL)[V1 endpoint](else:)[latest V2 endpoint] in your test environment.  You grab a test payload and use postman to hit your direct endpoint bypassing the API Gateway to your service provider app in the test environment.  You get a successful response.  
 
 Not seeing any issue using your sample request against the private endpoint you consider what to try next. 
 
-[[- Test your endpoint through Apigee->Test through Apigee With Test Request]]
+[[- Test your endpoint through API Gateway->Test through API Gateway With Test Request]]
 [[- Try something else.->Trouble Shoot]]
 
 
@@ -142,10 +140,10 @@ Since their request works fine when testing the V2 service in the test environme
 (set: $hasPayload to true)
 
 
-:: Test through Apigee With Test Request {"position":"650,475","size":"100,100"}
+:: Test through API Gateway With Test Request {"position":"650,475","size":"100,100"}
 (set:$time to ($time+5))(replace:?time)[$time]
-(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[After verifying that the backend is working for your simple test, validating the Apigee proxy is a good next move.  It turns out, in this case, that your proxy and backend are working as expected.  But being able to quickly rule out obvious major issues with the proxy is not a bad call. ]]
-You now decide to try to test more like the consumer by calling through Apigee. You pull up your saved Postman collection to test against your internal apigee endpoint for the (if:$hasURL)[V1](else:)[V2] using a saved payload you've used before. The request goes through just fine and you get a successful response.
+(if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[After verifying that the backend is working for your simple test, validating the API proxy is a good next move.  It turns out, in this case, that your proxy and backend are working as expected.  But being able to quickly rule out obvious major issues with the proxy is not a bad call. ]]
+You now decide to try to test more like the consumer by calling through the API Gateway. You pull up your saved Postman collection to test against your API Gateway endpoint for the (if:$hasURL)[V1](else:)[V2] using a saved payload you've used before. The request goes through just fine and you get a successful response.
 
 Not finding any issue, you consider what to do next...
 
@@ -154,6 +152,7 @@ Not finding any issue, you consider what to do next...
 
 :: TimeHeader [header] {"position":"975,125","size":"100,100"}
 (align:"==>")[(border:"solid")[(color:yellow)[Time spent: [(str:$time)]<time| Minutes]]]
+
 
 
 :: Trouble Shoot {"position":"950,350","size":"100,100"}
@@ -165,23 +164,13 @@ Not finding any issue, you consider what to do next...
 [[- Ask what URL the consumer is using and what is the error?->Check URL]]\
 (if: $hasURL is true AND $hasPayload is true)\
 [[- Test with Consumer's Payload and URL.->Use Consumer Payload and URL]]
-[[- Bypass Apigee to test  your service provider directly.->Test Private Endpoint]]
+[[- Bypass API Gateways to test  your service provider directly.->Test Private Endpoint]]
 (if: $hasPayload is false)\
 [[- Ask the consumer for the request data they are using and test with it.->Test With Consumer Payload]]
 [[- Ask a different consumer of the service to check if the service is working.->Check Another Consumer]]
 [[- Check the app logs for errors or exceptions.->Check App Logs]]
 
-
-
-
-
-
-
-
-
-
-
-(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")]
+(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")] 
 
 
 :: Use Consumer Payload and URL {"position":"1275,700","size":"100,100"}
