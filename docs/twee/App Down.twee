@@ -39,7 +39,7 @@ You see the app metrics stopped sending at the time the restart was attempted, b
 
 (if: $checkedLogs is false)\
 [[Check the logs]] 
-[[Investigate the pods further in Kubernetes]]
+[[Investigate the container runtimes.->Investigate the pods further in Kubernetes]]
 
 
 :: Check the logs {"position":"1100,825","size":"100,100"}
@@ -50,7 +50,7 @@ You see that the logs stopped when they attempted to restart the application. No
 
 (if: $checkedNewRelic is false)\
 [[Check Application Performance Monitoring ]] 
-[[Investigate the pods further in Kubernetes]]
+[[Investigate the containers/pods further in Kubernetes->Investigate the pods further in Kubernetes]]
 
 
 :: Commit and deploy {"position":"900,1450","size":"100,100"}
@@ -93,12 +93,18 @@ What do you want to do now?
 :: Investigate the pods further in Kubernetes {"position":"900,950","size":"200,100"}
 (set:$time to ($time+2))(replace:?time)[$time]
 
-You pull up your handy dandy CLI and start exploring with //kubectl//
+You decide to examine the running containers more closely.  
+Since your containers are running in Kubernetes pods, you know your best route is to use the //kubectl//  CLI.
 
-First up, lets understand what we are working with, lets get the pods:
+So you pull up your handy dandy CLI and start exploring the containers with the //kubectl get pods// command.
+
+Let's see what we have:
 
   <img width=100% src="https://raw.githubusercontent.com/javaplus/Problem_Solving/refs/heads/master/images/cve-scenario/getPods.png"/>
-Yup there is the problem as described. Now what?
+Yup there is the problem.  There are 0 ready containers and a //RunContainerError//. 
+
+Now what?
+
 
 [[Describe the pod]]
 [[Try increasing the replicas for the pod]]
@@ -156,7 +162,7 @@ Your teammate was a bit confused at first as to why you needed information to wo
  
  [[Check the logs]]
  [[Check Application Performance Monitoring ]]
- [[Investigate the pods further in Kubernetes]]
+ [[Check the application containers->Investigate the pods further in Kubernetes]]
 
 
 :: Start {"position":"900,500","size":"100,100"}
@@ -237,7 +243,7 @@ You issue the ``kubectl delete pod`` command to delete the pod(s), upon doing so
 You bump the version, build, and attempt a deploy and the same error occurs! We need to bump the version to at least 2.0 to avoid this CVE.
 ]
 
-You investiage artifactory to see which versions are available and find the following:
+You search the artifact repository (Maven in this case) to see which versions are available and find the following:
 
 
 * 1.2.18
@@ -264,7 +270,7 @@ In a reasonable panic you first check production in fear of an outage. You send 
 :: Validate deployment {"position":"900,1575","size":"100,100"}
 (set:$time to ($time+10))(replace:?time)[$time]
 
-You check the pod is up and running. You test the application is running in the environment and it all checks out. Splunk looks clean and New Relic shows a healthy app is running.
+You check the pod is up and running. You test the application is running in the environment and it all checks out. Your app logs look clean and Application Monitoring shows a healthy app is running.
 
 Do a little dance and celebrate you did it!
 
