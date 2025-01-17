@@ -1,5 +1,5 @@
 :: StoryTitle
-Problem Solving
+MixedSignals
 
 
 :: StoryData
@@ -112,9 +112,6 @@ A consumer of your REST API reaches out to you and says they are getting errors 
 (set:$time to 0)
 
 
-
-
-
 :: Test Private Endpoint {"position":"600,325","size":"100,100"}
 (set:$time to ($time+5))(replace:?time)[$time]
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[Doing a quick test against your backend service in an isolated way by bypassing API Gateway is not a bad idea.  Being able to quickly verify your back end is up and running is a good idea when there is a reported issue.  In this scenario, it turns out that your backend is up and running just fine, but if you are able to do a quick test to verify your backend is up and running, this saves you from having to dig into logs or find out what's wrong with the backend when there really isn't an issue there. ]]
@@ -132,8 +129,10 @@ Not seeing any issue using your sample request against the private endpoint you 
 In an attempt to get more specific context around how they are testing, you ask the consumer for the payload request they are using to call your service.  Upon receiving the payload, you recognize it as a newer V2 service request message.  You therefore run a test against the V2 version of your service in the test environment and get back a successfull response.
 
 Since their request works fine when testing the V2 service in the test environment, you consider your next steps...
-
+(if: $hasURL is false)
 [[- Ask the consumer to send the URL they are using to hit your API.->Use Consumer Payload and URL]] 
+(if: $hasURL is true)
+[[- Compare consumer payload with the endpoint they sent you. ->Use Consumer Payload and URL]] 
 [[- Consider other options->Trouble Shoot]] 
 
 
@@ -154,7 +153,6 @@ Not finding any issue, you consider what to do next...
 (align:"==>")[(border:"solid")[(color:yellow)[Time spent: [(str:$time)]<time| Minutes]]]
 
 
-
 :: Trouble Shoot {"position":"950,350","size":"100,100"}
 (if: $showHelp is true)[(text-colour:red)[Lessons:] (text-colour:blue)[It's very challenging to troubleshoot an issue unless you can reproduce the issue.  If instead of reproducing the issue, you simply start checking logs or make assumptions, you may get lucky, but most problems in complex environments aren't so easy and so it's better to figure out how to reproduce the problem so you can quickly get to the root.  So, think about the fastest way to reproduce the issue. Usually it involves understanding the context around the issue.  That is what are the exact conditions that are causing the issue and then how to isolate different parts of the system to figure out where the problem lies.]]
 
@@ -170,7 +168,7 @@ Not finding any issue, you consider what to do next...
 [[- Ask a different consumer of the service to check if the service is working.->Check Another Consumer]]
 [[- Check the app logs for errors or exceptions.->Check App Logs]]
 
-(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")] 
+(link: "enable help")[(set: $showHelp to true)(goto: "Trouble Shoot")]
 
 
 :: Use Consumer Payload and URL {"position":"1275,700","size":"100,100"}
