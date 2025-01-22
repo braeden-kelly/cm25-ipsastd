@@ -1,0 +1,3 @@
+- https://javaplus.github.io/Problem_Solving/
+- https://discord.com/channels/1127340805741359164/1328023753732522056
+- https://github.com/javaplus
